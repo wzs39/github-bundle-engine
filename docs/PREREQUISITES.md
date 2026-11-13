@@ -30,18 +30,19 @@
 | 要什么 | 一个 classic 或 fine-grained PAT，**只需公开仓库只读权限**（`public_repo` / `Contents: read`），不需要写权限 |
 | 为什么 | 未认证时 GitHub Search API 只有 **60 次/小时**，4 个专题各要搜索 + 逐仓库查 Release，一次 `build --all` 就可能撞限流；脚本虽会按 `X-RateLimit-Reset` 自动等待，但会拖到几十分钟 |
 | 从哪拿 | GitHub → Settings → Developer settings → Personal access tokens → Generate new token |
-| 填到哪 | 环境变量 `GITHUB_TOKEN`（或写入本地 `.env`，见 [.env.example](../.env.example)）。`gh auth` 已登录不代表 Python 脚本能拿到 token，两者是两套凭据 |
-| 验收 | `python -c "import os;print('TOKEN_OK', bool(os.environ.get('GITHUB_TOKEN')))"` → `True` |
+| 填到哪 | 环境变量 `GITHUB_TOKEN`（或写入本地 `.env`，见 [.env.example](../.env.example)）。`check_prereqs.py` 与 `run_daily.ps1` 都会自动加载 `.env` |
+| 现状 | **本机已就绪**：`.env` 已由 gh 登录态（wzs39）生成并完成验收。可选加固：另建一个只读（Contents: read）fine-grained PAT 替换，缩小凭据面 |
+| 验收 | `python scripts/check_prereqs.py` → A1 显示 OK |
 
 ### A2 · 网盘推广渠道报备 + 真实推广链
 
 | 项 | 内容 |
 | --- | --- |
-| 要什么 | ① 在任推邦 / 星子助推 / 洽立方**任选其一**注册并通过一级服务商审核；② 申请**夸克网盘**（主力高单价）+ **百度网盘**（覆盖存量用户）推广权限；③ 绑定专用存储网盘 UID 并完成渠道报备；④ 为每个专题目录生成**推广渠道**分享链接 + 提取码（各 1 组，共 4 组） |
+| 要什么 | ① 在任推邦 / 星子助推 / 洽立方**任选其一**注册并通过一级服务商审核；② 申请**夸克网盘**（主力高单价）+ **百度网盘**（覆盖存量用户）推广权限；③ 绑定专用存储网盘 UID 并完成渠道报备；④ 为每个专题目录生成**推广渠道**分享链接 + 提取码（各 1 组，共 9 组） |
 | 为什么 | 普通分享链不触发 T+1 拉新佣金（约 7–12 元/新用户）与转存收益（约 0.3–0.5 元/次）；`bind-pan` 会明确拒掉占位符和非 http(s) 链，就是为了不让你误用普通链 |
 | 从哪拿 | 服务商后台 → 推广管理 → 夸克/百度网盘 → 生成推广链接；**必须是已报备 UID 名下生成的链** |
-| 填到哪 | 逐个执行 `python -m src.cli bind-pan --topic <id> --share-url <真实链> --extract-code <码> --promote-uid <UID> --out OUTPUT_DIR`，`<id>` 取 `local-ai` / `py-office` / `grad-project` / `portfolio` |
-| 验收 | `python -m src.cli verify --out OUTPUT_DIR` 打印 `推广链绑定: 4/4`；排程表 `[待补]` 标记消失 |
+| 填到哪 | 逐个执行 `python -m src.cli bind-pan --topic <id> --share-url <真实链> --extract-code <码> --promote-uid <UID> --out OUTPUT_DIR`，`<id>` 取 `local-ai` / `py-office` / `grad-project` / `portfolio` / `kaoyan` / `gaokao` / `english` / `study-software` / `hot-oss` |
+| 验收 | `python -m src.cli verify --out OUTPUT_DIR` 打印 `推广链绑定: 9/9`；排程表 `[待补]` 标记消失 |
 
 > 顺序提示：先 `build --all` 产出真实目录 → 上传网盘 → 生成推广链 → 再 `bind-pan`。重建包时引擎会自动保活已有的 `pan` 段，不会把绑定冲掉。
 
@@ -49,11 +50,12 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 要什么 | 跑一次 `python -m src.cli build --all --out OUTPUT_DIR` |
-| 为什么 | 当前 4 个包全是 `fixture-org/demo-project-*` 离线夹具，`package_mb ≈ 0.01`、`size_ok=false`；策略书要求单专题 500MB–2GB 才有干货感、才能促使买家转存 |
+| 要什么 | 跑一次 `python -m src.cli build --all --out OUTPUT_DIR`（或直接 `daily` 一条龙） |
+| 为什么 | 夹具包 `package_mb ≈ 0.01`；策略书要求单专题 500MB–2GB 才有干货感、才能促使买家转存 |
 | 从哪拿 | 依赖 A1；`download_mirrors` 见 B1 |
-| 填到哪 | 直接跑命令；产物覆盖 `OUTPUT_DIR/2026持续更新_*合集/` |
-| 验收 | `verify` 不再打印「体积未达 500-2048 MB」；`_manifest.json` 里 `repos[].full_name` 是真实 GitHub 仓库 |
+| 填到哪 | 直接跑命令；产物覆盖 `OUTPUT_DIR/2026持续更新_*合集/`。注意磁盘需数 GB，日志/缓存都在 OUTPUT_DIR 下 |
+| 现状 | **链路已验证**：kaoyan 真实构建通过（搜索 → 合规闸排除 17 个 → 真实下载 10 仓库 → 370 MB 成包） |
+| 验收 | `verify` 的体积清单变短或为空；`_manifest.json` 里 `repos[].full_name` 是真实 GitHub 仓库。体积门槛已支持专题级覆盖：考研 150 / 高考 100 / 英语 150 / 热门开源 300 MB，纯笔记专题不再与 500MB 全局下限死磕 |
 
 ### A4 · 闲鱼独立账号 + 自动发货
 
@@ -118,8 +120,9 @@ B1 填法示例（改成你的实际前缀，别照抄）：
 | git | 2.51.2.windows.1，身份 `overthinkknow <wang391435@qq.com>` |
 | GitHub CLI | 已安装并登录，账号 `wzs39`（`gh api user --jq .login`） |
 | 仓库 | https://github.com/wzs39/github-bundle-engine ，公开，MIT，默认分支 `main` |
-| 代码 | 42 项离线回归 OK；`audit_all` 11/11 Python 文件 PASS |
-| 离线全链路 | `selftest --all-topics` / `verify` / `schedule` / `report` 全部 RC=0 |
+| 代码 | 56 项离线回归 OK（含热点发现 / 盈利核算 / 合规词边界） |
+| 离线全链路 | trends(实网 11/12 源) → selftest 9 专题 → bind-pan ×9 → schedule → profit → verify 全部 RC=0 |
+| 热点发现 | 12 源 8 向垂直（AI/技能/热门项目/考研/高考/英语/学习软件/热门开源），`daily` 一条龙可挂计划任务 |
 
 也就是说：**现在就可以跑 `selftest` 和 `schedule`，一分钱不花、一样东西都不用准备。**
 
@@ -132,8 +135,7 @@ B1 填法示例（改成你的实际前缀，别照抄）：
 python -m src.cli selftest --all-topics --out OUTPUT_DIR
 python scripts/check_prereqs.py                      # 看还差哪几项
 
-# ② 备齐 A1 + B1 后，真实抓取
-set GITHUB_TOKEN=[GITHUB_TOKEN]
+# ② A1 已就绪；B1 可选，直接真实抓取（或 daily 一条龙含热点发现）
 python -m src.cli build --all --out OUTPUT_DIR
 
 # ③ 备齐 A2 + A5 后，逐个绑定推广链（占位符会被拒绝）
@@ -156,15 +158,20 @@ python -m src.cli schedule --days 7 --existing-links 4 --out OUTPUT_DIR
 按下面这份回我就够了，其余我自动补齐并复跑验收：
 
 ```
-GITHUB_TOKEN=[...]
+GITHUB_TOKEN=[已就绪, 来自 gh 登录态]
 PAN_PROMOTE_UID=[...]
 MIRROR_PREFIX_1=[...]
 XIANYU_AUTO_REPLY_PLUGIN=[...]
 
-local-ai     分享链=[...] 提取码=[...]
-py-office    分享链=[...] 提取码=[...]
-grad-project 分享链=[...] 提取码=[...]
-portfolio    分享链=[...] 提取码=[...]
+local-ai       分享链=[...] 提取码=[...]
+py-office      分享链=[...] 提取码=[...]
+grad-project   分享链=[...] 提取码=[...]
+portfolio      分享链=[...] 提取码=[...]
+kaoyan         分享链=[...] 提取码=[...]
+gaokao         分享链=[...] 提取码=[...]
+english        分享链=[...] 提取码=[...]
+study-software 分享链=[...] 提取码=[...]
+hot-oss        分享链=[...] 提取码=[...]
 ```
 
 或者自己写进本地 `.env`（模板见 [.env.example](../.env.example)），不用发给我。`gh` 已登录、`git` 身份已配、仓库已推，这几样不用再给。
