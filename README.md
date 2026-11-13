@@ -11,8 +11,8 @@ GitHub 热门开源项目自动化打包引擎。按策略书把「GitHub 抓取
 ```
 github-bundle-engine/
 ├── config/
-│   ├── topics.json        7 个垂直专题: 标签 / Star 门槛 / 定价 / 长尾词 / 三段中文场景导语
-│   ├── trends.json        热点源与垂直方向: AI / 技能 / 热门项目 / 考研 / 高考 / 英语
+│   ├── topics.json        9 个垂直专题: 标签 / Star 门槛 / 定价 / 长尾词 / 三段中文场景导语
+│   ├── trends.json        热点源与垂直方向: AI / 技能 / 热门项目 / 考研 / 高考 / 英语 / 学习软件 / 热门开源
 │   ├── settings.json      API 根 / 限流 / 镜像 / 网盘与闲鱼参数
 │   └── compliance.json    内容黑名单 / 协议白名单 / 资产上限 / 声明路径
 ├── src/
@@ -54,7 +54,7 @@ python scripts/check_prereqs.py                 # 逐项打印「已就绪 / 待
 python -m src.cli selftest --all-topics --out OUTPUT_DIR
 
 # 1.5) 热点发现: 读热门总结站 (GitHub Trending / 微博热搜 / B站热门),
-#      按 AI / 技能 / 热门项目 / 考研 / 高考 / 英语 六个垂直方向归属,
+#      按 AI / 技能 / 热门项目 / 考研 / 高考 / 英语 / 学习软件安装 / 热门开源软件 八个垂直方向归属,
 #      出发现报告; --apply 会把今日热词写回 topics.json 的 long_tail,
 #      并把命中的候选标签前置进 search_tags (先自动备份 *.bak)
 python -m src.cli trends --out OUTPUT_DIR
@@ -95,7 +95,7 @@ python scripts/economics.py
 
 重建保活：`build` / `selftest` 覆盖旧包前会抢救旧 `_manifest.json` 的 `pan` 段与 `01` 文件里「## 买家高频咨询补充」之后的 FAQ，重建后原样回写，并在 manifest 里留 `rebuild_preserved`。所以每周追加更新不会把已绑定推广链和售后迭代内容删掉。`verify` 会额外打印体积未达标（500–2048 MB）的包清单。
 
-离线回归已扩到 48 项：`python -m unittest discover -s tests -v`。
+离线回归已扩到 51 项：`python -m unittest discover -s tests -v`。
 
 Windows 下 `python` 若不在 PATH，用 `py -3 -m src.cli ...`。所有产物落在 `--out` 指定目录，默认 `OUTPUT_DIR`。
 
@@ -108,7 +108,7 @@ python -m src.cli daily --out OUTPUT_DIR    # 热点 -> 刷新专题 -> 构建 -
 ```
 
 - **热点源**（`config/trends.json`，可自行增删）：GitHub Trending（总榜 / Python / Jupyter Notebook）、微博热搜、B站热门。每源独立失败降级：单站改版或断网只记 WARN，不阻塞流水线；原始响应留档 `OUTPUT_DIR/cache/trends/` 便于排查。
-- **垂直方向**：`ai / skill / hot-projects / kaoyan / gaokao / english` 六向关键词归属，前四个对应 topics.json 里的专题（local-ai / py-office / kaoyan / gaokao / english）；考研、高考、英语是新增垂直专题，走与其它专题完全相同的合规闸（LICENSE 白名单 + 黑名单 + 声明）。
+- **垂直方向**：`ai / skill / hot-projects / kaoyan / gaokao / english / study-software / hot-oss` 八向关键词归属，绑定 topics.json 里的专题（local-ai / py-office / kaoyan / gaokao / english / study-software / hot-oss）；新增专题走与其它专题完全相同的合规闸（LICENSE 白名单 + 黑名单 + 声明）。PS/SolidWorks 等商业软件本体不在收录范围, 学习软件方向只收开源替代（GIMP/Krita/FreeCAD/Blender 等）与官方免费安装器。
 - **建议与写回**（`--apply`）：今日热词按命中频次写进专题 `long_tail`（闲鱼标题轮转池），命中热词的候选标签前置进 `search_tags`（决定 build 抓什么）， trending 上的相关仓库进 `trend_repos` 供人工复核。**价格 / 受众 / 场景导语永不自动修改**；建议词先过文案红线与 `compliance.block_terms` 黑名单，热搜里出现"破解"类词会被直接滤掉。
 - **备份**：写回前自动存 `topics_<时间戳>.bak`（已入 .gitignore），改坏了随时回滚。
 - **计划任务**：`scripts/run_daily.ps1` 自动加载 `.env` 里的 `GITHUB_TOKEN`，全程日志落在 `OUTPUT_DIR/logs/daily_<日期>.log`，注册每天 08:30 的示例见脚本头注释。

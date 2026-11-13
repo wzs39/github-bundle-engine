@@ -435,6 +435,12 @@ class TestTrends(unittest.TestCase):
         '<span class="d-inline-block float-sm-right"> 2,500 stars today </span>'
         '<span itemprop="programmingLanguage">TypeScript</span>'
         "</article>"
+        '<article class="Box-row">'
+        '<h2 class="h3"><a href="/acme/freecad-solidworks-notes/stargazers">t</a></h2>'
+        '<p class="col-9 color-fg-muted my-1 pr-2">SolidWorks 学习替代 FreeCAD 建模与装配笔记</p>'
+        '<span class="d-inline-block float-sm-right"> 980 stars today </span>'
+        '<span itemprop="programmingLanguage">C++</span>'
+        "</article>"
         "</body></html>"
     )
 
@@ -457,6 +463,11 @@ class TestTrends(unittest.TestCase):
                      "desc": "english speaking practice"},
                 ]}
             },
+            "gh-search-popular-oss": {"items": [
+                {"full_name": "acme/libreoffice-notes", "stargazers_count": 5000,
+                 "description": "开源办公套件 装机 笔记软件推荐", "topics": ["office-suite"],
+                 "html_url": "https://github.com/acme/libreoffice-notes"},
+            ]},
         }
     }
 
@@ -467,13 +478,14 @@ class TestTrends(unittest.TestCase):
 
     def test_parse_github_trending(self) -> None:
         items = parse_github_trending(self.GH_HTML, "gh-trending-daily")
-        self.assertEqual(2, len(items))
+        self.assertEqual(3, len(items))
         first = items[0]
         self.assertEqual("acme/kaoyan-408-notes", first.repo)
         self.assertEqual(1234, first.heat)
         self.assertIn("考研 408", first.extra)
         self.assertIn("[Python]", first.extra)
         self.assertEqual("https://github.com/acme/kaoyan-408-notes", first.url)
+        self.assertEqual("acme/freecad-solidworks-notes", items[2].repo)
 
     def test_parse_json_api_weibo_and_bilibili(self) -> None:
         weibo = parse_json_api(self.FIXTURE["sources"]["weibo-hot"], {
@@ -531,6 +543,7 @@ class TestTrends(unittest.TestCase):
         items += parse_json_api(self.FIXTURE["sources"]["bilibili-popular"], {
             "item_path": "data.list", "title_field": "title", "heat_field": "stat.view",
         }, "bilibili-popular")
+        items += parse_github_search(self.FIXTURE["sources"]["gh-search-popular-oss"], "gh-search-popular-oss")
         trends_cfg = load_config(ENGINE_ROOT / "config" / "trends.json")
         scores = score_verticals(items, trends_cfg["verticals"])
         self.assertGreater(scores["kaoyan"]["hits"], 0)
@@ -538,6 +551,11 @@ class TestTrends(unittest.TestCase):
         self.assertGreater(scores["ai"]["hits"], 0)
         self.assertGreater(scores["gaokao"]["hits"], 0)
         self.assertGreater(scores["english"]["hits"], 0)
+        # 学习软件与热门开源软件垂直
+        self.assertGreater(scores["study-software"]["hits"], 0)
+        self.assertIn("solidworks", scores["study-software"]["keyword_hits"])
+        self.assertGreater(scores["hot-oss"]["hits"], 0)
+        self.assertIn("装机", scores["hot-oss"]["keyword_hits"])
         # 黑名单词出现在热搜里, 但不得进入任何建议词
         self.assertIn("破解软件合集", [i.title for i in items])
 

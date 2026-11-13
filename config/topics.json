@@ -7,7 +7,12 @@
     {
       "id": "local-ai",
       "name": "本地AI与大模型工具箱",
-      "search_tags": ["llm", "ollama", "comfyui", "ai-agent"],
+      "search_tags": [
+        "llm",
+        "ollama",
+        "comfyui",
+        "ai-agent"
+      ],
       "extra_query": "topic:llm",
       "min_stars": 3000,
       "pushed_after_days": 365,
@@ -21,12 +26,21 @@
         "这份合集按「先跑起来 -> 再换模型 -> 最后接界面」的顺序编排, 00 清单给出每个项目的 Star 数、协议与落地目录, 01 文件把 Python/Node 与国内镜像源一次配好, 02 目录放官方 Release 的 Windows 安装包, 03 目录是完整源码与原始 LICENSE。",
         "最快路径: 先看 01 配环境, 再从 02 挑一个整合包直接双击, 跑通之后回 00 清单按编号找对应源码改配置。每周会往同一文件夹追加新项目, 不用重新买。"
       ],
-      "long_tail": ["本地大模型", "ollama 整合包", "comfyui 中文教程", "AI 工具合集"]
+      "long_tail": [
+        "本地大模型",
+        "ollama 整合包",
+        "comfyui 中文教程",
+        "AI 工具合集"
+      ]
     },
     {
       "id": "py-office",
       "name": "Python办公自动化神器",
-      "search_tags": ["automation", "pdf-tools", "python-scripts"],
+      "search_tags": [
+        "automation",
+        "pdf-tools",
+        "python-scripts"
+      ],
       "extra_query": "language:python",
       "min_stars": 1500,
       "pushed_after_days": 540,
@@ -40,12 +54,21 @@
         "这里按使用场景收了同一类高星脚本: 文档、表格、下载、清洗。每个项目都保留原 LICENSE 与原仓库地址, 00 清单里可以直接按 Star 数和摘要挑, 03 目录按编号放好源码。",
         "01 文件给的是 pip 清华/阿里源与常见报错处理, 配一次之后基本不用再动。脚本跑不通时先看 01 的 FAQ, 再回订单内留言, 高频问题会补进下一版 01。"
       ],
-      "long_tail": ["批量处理 PDF", "Excel 自动化", "Python 脚本合集", "办公效率工具"]
+      "long_tail": [
+        "批量处理 PDF",
+        "Excel 自动化",
+        "Python 脚本合集",
+        "办公效率工具"
+      ]
     },
     {
       "id": "grad-project",
       "name": "毕设与全栈管理系统模板",
-      "search_tags": ["spring-boot", "vue", "management-system"],
+      "search_tags": [
+        "spring-boot",
+        "vue",
+        "management-system"
+      ],
       "extra_query": "topic:spring-boot",
       "min_stars": 800,
       "pushed_after_days": 730,
@@ -59,12 +82,22 @@
         "这份合集挑的是结构完整、能直接读的管理系统工程: 后端分层、前端路由、菜单权限、SQL 脚本都在。00 清单标了协议和 Star, 03 目录按编号排好, 逐个对照着看架构比看零散博客快得多。",
         "01 文件覆盖 JDK/Maven/Node 国内源与端口占用等常见问题。建议先跑通一个工程, 再按需替换其中的业务模块; 引用时请保留原项目 LICENSE 与作者链接。"
       ],
-      "long_tail": ["毕业设计 源码", "springboot vue 后台", "管理系统模板", "课设参考"]
+      "long_tail": [
+        "毕业设计 源码",
+        "springboot vue 后台",
+        "管理系统模板",
+        "课设参考"
+      ]
     },
     {
       "id": "portfolio",
       "name": "高颜值简历与个人主页",
-      "search_tags": ["portfolio", "resume", "hexo", "hugo-theme"],
+      "search_tags": [
+        "portfolio",
+        "resume",
+        "hexo",
+        "hugo-theme"
+      ],
       "extra_query": "topic:portfolio",
       "min_stars": 500,
       "pushed_after_days": 730,
@@ -78,12 +111,23 @@
         "这里收的是高星简历/作品集/博客主题与静态站生成器: 多数改一个配置文件就能换成自己的内容, 不需要后端, 也不需要买服务器。00 清单按 Star 和协议列好, 03 目录直接是源码。",
         "01 文件给 Node 与 npm 国内镜像命令。挑一套顺眼的 -> 改配置里的姓名/项目/链接 -> 本地预览 -> 导出静态文件, 整个过程通常半小时内能走完。"
       ],
-      "long_tail": ["个人主页模板", "简历网页", "hexo 主题", "hugo 博客"]
+      "long_tail": [
+        "个人主页模板",
+        "简历网页",
+        "hexo 主题",
+        "hugo 博客"
+      ]
     },
     {
       "id": "kaoyan",
       "name": "考研资料与上岸工具箱",
-      "search_tags": ["kaoyan", "考研", "408", "cs-books", "interview"],
+      "search_tags": [
+        "kaoyan",
+        "考研",
+        "408",
+        "cs-books",
+        "interview"
+      ],
       "extra_query": "",
       "min_stars": 100,
       "pushed_after_days": 1825,
@@ -97,12 +141,23 @@
         "这份合集按「公共课 -> 408 专业课 -> 复试面试」收高星整理仓库: 笔记、真题索引、刷题工具、经验帖分类编排, 每个仓库保留原地址与 LICENSE, 00 清单按科目和 Star 排好, 缺哪门直接翻哪门。",
         "01 文件给出 PDF 阅读与打印排版的小工具清单。仓库里以笔记和索引为主, 真题类内容请以官方出版渠道为准, 这里只收开源整理与工具。"
       ],
-      "long_tail": ["考研资料合集", "408 笔记", "复试经验", "考研工具"]
+      "long_tail": [
+        "考研资料合集",
+        "408 笔记",
+        "复试经验",
+        "考研工具"
+      ]
     },
     {
       "id": "gaokao",
       "name": "高考志愿与学习资源包",
-      "search_tags": ["gaokao", "高考", "志愿填报", "education", "notes"],
+      "search_tags": [
+        "gaokao",
+        "高考",
+        "志愿填报",
+        "education",
+        "notes"
+      ],
       "extra_query": "",
       "min_stars": 30,
       "pushed_after_days": 1825,
@@ -116,12 +171,24 @@
         "这里收的是高星志愿参考与学科整理仓库: 录取数据整理脚本、学科笔记、学习计划工具。00 清单按「志愿参考 -> 学科资料 -> 学习工具」排好, 每个都标了数据年份与来源, 旧数据当参考别当依据。",
         "提醒写在前面: 分数线与招生计划以省考试院当年发布为准, 合集里的开源数据只用于提前建立概念和缩小范围。"
       ],
-      "long_tail": ["高考志愿填报", "学科笔记", "一分一段表", "学习资源包"]
+      "long_tail": [
+        "高考志愿填报",
+        "学科笔记",
+        "一分一段表",
+        "学习资源包"
+      ]
     },
     {
       "id": "english",
       "name": "英语学习资源与工具箱",
-      "search_tags": ["english-learning", "vocabulary", "ielts", "toefl", "anki", "dictionary"],
+      "search_tags": [
+        "english-learning",
+        "vocabulary",
+        "ielts",
+        "toefl",
+        "anki",
+        "dictionary"
+      ],
       "extra_query": "",
       "min_stars": 200,
       "pushed_after_days": 1825,
@@ -135,7 +202,74 @@
         "这份合集收高星的词库与 Anki 卡组、听力与播客索引、语法与阅读材料、词典与跟读工具, 按「词汇 -> 听力 -> 阅读 -> 口语」编排, 00 清单标注适用考试(四六级/考研/雅思/托福)与 Star。",
         "01 文件给 Anki 与词库导入的中文步骤。所有内容来自开源社区, 商业课程与版权材料不收; 版权敏感的词书资源若仓库无明确授权, 会在合规闸被过滤掉。"
       ],
-      "long_tail": ["背单词工具", "英语学习资源", "anki 卡组", "雅思托福资料"]
+      "long_tail": [
+        "背单词工具",
+        "英语学习资源",
+        "anki 卡组",
+        "雅思托福资料"
+      ]
+    },
+    {
+      "id": "study-software",
+      "name": "PS·CAD学习软件安装与开源替代",
+      "search_tags": [
+        "gimp",
+        "krita",
+        "inkscape",
+        "freecad",
+        "blender",
+        "cad"
+      ],
+      "extra_query": "",
+      "min_stars": 300,
+      "pushed_after_days": 1825,
+      "repo_limit": 15,
+      "price": 3.9,
+      "price_tier": "利润款",
+      "audience": "设计入门与机械专业学生 PS/CAD 类软件学习 想零成本装齐工具",
+      "selling_point": "开源替代齐全 | 官方安装器直装 | 中文环境配置",
+      "intro": [
+        "学设计或机械, 第一道坎不是操作, 是装软件: PS 与 SolidWorks 是商业软件, 学生找人传安装包, 版本旧、带捆绑、还常缺运行库, 装完报错又找不到原因。",
+        "这份合集收的是能完成同类学习任务的开源软件与官方免费安装器: 修图用 GIMP/Krita 与 PhotoGIMP 套件, 矢量用 Inkscape, 三维建模用 FreeCAD/Blender。02 目录直接放官方 Release 安装包, 00 清单标了每款与 PS/SolidWorks 的功能对应关系, 按需挑装。",
+        "说明写在前面: 商业软件本体与破解激活类资源不在合集内, 这类仓库会在合规闸被自动过滤; 开源替代覆盖课程作业与入门学习的绝大多数操作, 深度商业插件需求请走官方学生授权渠道。"
+      ],
+      "long_tail": [
+        "PS 替代软件",
+        "CAD 开源",
+        "SolidWorks 替代",
+        "软件安装教程"
+      ]
+    },
+    {
+      "id": "hot-oss",
+      "name": "热门开源软件装机精选",
+      "search_tags": [
+        "media-player",
+        "note-taking",
+        "download-manager",
+        "file-manager",
+        "office-suite",
+        "launcher"
+      ],
+      "extra_query": "",
+      "min_stars": 500,
+      "pushed_after_days": 1095,
+      "repo_limit": 15,
+      "price": 1.99,
+      "price_tier": "走量款",
+      "audience": "新电脑装机与效率工具玩家 想一次配齐播放下载笔记办公套件",
+      "selling_point": "官方安装器直装 | 分类编排 | 全部开源可商检",
+      "intro": [
+        "新电脑装机的痛苦在于清单: 播放器、下载器、压缩、笔记、办公套件、文件管理, 每个都要搜一遍官网, 还要分辨哪个是原版哪个是套壳。",
+        "这份合集按使用场景收高星开源软件: 办公套件 LibreOffice、笔记类、播放器、下载管理、文件管理与启动器, 02 目录全是官方 Release 安装包, 00 清单给出每个软件的定位与选型建议。",
+        "01 文件给常见运行库与关联设置的处理办法。全部开源、保留原仓库地址与协议, 追求最新版本时按 00 清单的仓库地址自行取 Release 即可。"
+      ],
+      "long_tail": [
+        "开源软件推荐",
+        "装机必备",
+        "免费办公软件",
+        "视频播放器"
+      ]
     }
   ]
 }

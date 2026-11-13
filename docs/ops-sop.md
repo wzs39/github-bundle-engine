@@ -95,7 +95,7 @@ python -m src.cli daily --out OUTPUT_DIR
 # 或带日志挂计划任务 (每天 08:30): scripts/run_daily.ps1
 ```
 
-daily 会依次执行：**热点发现（GitHub Trending / 微博热搜 / B站热门）→ 按六向垂直（AI / 技能 / 热门项目 / 考研 / 高考 / 英语）归属 → 把今日热词与候选标签写回 topics.json（先备份）→ 构建全部专题包 → 校验 → 排程**。单段失败降级为 WARN 不中断；热点零数据时跳过构建并以退出码 1 告警，挂计划任务后只看 `OUTPUT_DIR/logs/` 即可。
+daily 会依次执行：**热点发现（GitHub Trending / 微博热搜 / B站热门）→ 按八向垂直（AI / 技能 / 热门项目 / 考研 / 高考 / 英语 / 学习软件安装 / 热门开源软件）归属 → 把今日热词与候选标签写回 topics.json（先备份）→ 构建全部专题包 → 校验 → 排程**。单段失败降级为 WARN 不中断；热点零数据时跳过构建并以退出码 1 告警，挂计划任务后只看 `OUTPUT_DIR/logs/` 即可。
 
 人工只需做三件事：核一眼 `reports/trends_<日期>.md` 的选题方向、把新包上传网盘、走下面的上架与售后流程。`trend_repos` 字段列出今日 trending 上与各垂直相关的高星仓库，要扩细分专题时从这里面挑。
 
