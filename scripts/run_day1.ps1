@@ -28,11 +28,10 @@ foreach ($f in $must) {
 }
 Info "配置齐全"
 
-Info "3/6 可选环境变量 (缺值用占位符继续, 不阻塞离线试跑)"
-if (-not $env:GITHUB_TOKEN) { Warn "GITHUB_TOKEN 未设置 -> 真实 build 走未认证限速 (60 次/小时)" }
-if (-not $env:PAN_PROMOTE_UID) { Warn "PAN_PROMOTE_UID 未设置 -> 去任推邦/星子助推/洽立方申请夸克+百度网盘推广权" }
-if (-not $env:XIANYU_AUTO_REPLY_PLUGIN) { Warn "XIANYU_AUTO_REPLY_PLUGIN 未设置 -> 闲鱼网页版后台自动回复待配置" }
-Info "网盘分享链接占位: [PAN_SHARE_URL] / [PAN_EXTRACT_CODE]"
+Info "3/6 开工前自检: 按 docs/PREREQUISITES.md 逐项打印已就绪/待补 (退出码 1 只提示, 不阻塞离线试跑)"
+& $py.Source scripts/check_prereqs.py --out OUTPUT_DIR
+if ($LASTEXITCODE -ne 0) { Warn "A 类硬门槛仍有待补项, 详见 docs/PREREQUISITES.md 与上面的清单" }
+Info "网盘分享链接占位: [PAN_SHARE_URL] / [PAN_EXTRACT_CODE] (真实值只进本地 .env / bind-pan)"
 
 Info "4/6 离线全链路自检 (4 个专题 + 场景导语 + 上架物料 + 日报)"
 & $py.Source -m src.cli selftest --all-topics --out OUTPUT_DIR

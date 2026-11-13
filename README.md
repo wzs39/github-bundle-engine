@@ -4,6 +4,8 @@ GitHub 热门开源项目自动化打包引擎。按策略书把「GitHub 抓取
 
 零第三方依赖，Python 3.9+ 标准库即可运行。产物是**解压后的多级目录**（不压成单个死压缩包），直接上传网盘即可让买家预览并一键转存。
 
+> **要看「需要我准备什么」：直接读 [docs/PREREQUISITES.md](docs/PREREQUISITES.md)**，或跑 `python scripts/check_prereqs.py` 逐项自检（只读、不联网、不回显凭据）。离线 `selftest` 不需要任何外部输入；真实抓取/上架/结算需要 A 类 5 项硬门槛。
+
 ## 目录
 
 ```
@@ -25,14 +27,24 @@ github-bundle-engine/
 │   ├── declaration.txt    详情页统一合规声明 (含中文标点, 由文件读取而非硬编码)
 │   └── xianyu_detail.md.tpl
 ├── scripts/
+│   ├── check_prereqs.py   开工前自检: A/B/D 三类逐项打印已就绪/待补
 │   ├── economics.py       双引擎收益模型验算
 │   └── run_day1.ps1       Day 1 环境自检占位脚本
 ├── tests/
 │   └── test_engine.py     unittest 离线回归
-└── docs/ops-sop.md        Day 1–7 搭建期 + 每日 90 分钟 SOP
+├── .env.example           本地凭据模板 (复制为 .env 后填真实值)
+└── docs/
+    ├── PREREQUISITES.md   需要你准备什么 / 验收命令 / 给我什么格式
+    └── ops-sop.md         Day 1–7 搭建期 + 每日 90 分钟 SOP
 ```
 
 ## 快速开始
+
+先看差距再动手：
+
+```bash
+python scripts/check_prereqs.py                 # 逐项打印「已就绪 / 待补」
+```
 
 ```bash
 # 1) 离线跑通全链路 (不联网, 夹具生成 4 个专题包 + 上架物料 + 场景导语 + 日报)
@@ -122,7 +134,7 @@ OUTPUT_DIR/
 4. `verify` 会打印「推广链绑定: N/M」，`schedule` 会把未绑定专题的槽位标 `[待补] 该专题尚未 bind-pan`；上架前逐个补齐。
 5. 服务商后台 T+1 核对拉新与转存，转化率 < 5% 的链接淘汰。
 
-环境变量：`GITHUB_TOKEN`、`PAN_PROMOTE_UID`、`XIANYU_AUTO_REPLY_PLUGIN`。缺值时脚本用占位符继续跑，不阻塞。
+环境变量：`GITHUB_TOKEN`、`PAN_PROMOTE_UID`、`XIANYU_AUTO_REPLY_PLUGIN`。缺值时脚本用占位符继续跑，不阻塞。模板见 [.env.example](.env.example)；每一项的含义、来源、填到哪、验收命令见 [docs/PREREQUISITES.md](docs/PREREQUISITES.md)。
 
 ## 红线复述
 

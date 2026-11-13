@@ -2,6 +2,8 @@
 
 配套引擎：`github-bundle-engine/`。所有命令在引擎根目录执行，Windows 下 `python` 可换成 `py -3`。占位值统一用 `[GITHUB_TOKEN]`、`[PAN_SHARE_URL]`、`[PAN_EXTRACT_CODE]`、`[PAN_PROMOTE_UID]`。
 
+> **开工前先看 [PREREQUISITES.md](PREREQUISITES.md)**：把「需要你准备什么」按 A 类硬门槛 / B 类占位值 / C 类平台人工动作列全，并附 `python scripts/check_prereqs.py` 自检。离线试跑不需要任何外部输入。
+
 ---
 
 ## Day 1 — 环境、账号、权限
