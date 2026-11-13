@@ -56,6 +56,7 @@ from .listing import (
 from .packer import build_topic, safe_name
 from .pan import bind as bind_pan
 from .pan import find_manifests
+from .revenue import cumulative, projection, render_markdown, summary_line
 from .scheduler import build_schedule, render_schedule_md
 from .trends import run_trends
 
@@ -257,6 +258,10 @@ def cmd_build(args: argparse.Namespace) -> int:
     summary: list[dict[str, Any]] = []
     for topic in selected:
         log("构建专题: " + str(topic["name"]))
+        # 体积门槛支持专题级覆盖: 笔记类专题(考研/英语)天然到不了全局 500MB 下限
+        tcompliance = dict(compliance)
+        tcompliance["size_min_mb"] = int(topic.get("size_min_mb", compliance["size_min_mb"]))
+        tcompliance["size_max_mb"] = int(topic.get("size_max_mb", compliance["size_max_mb"]))
         query = build_query(topic)
         found = client.search(
             query,
@@ -306,7 +311,7 @@ def cmd_build(args: argparse.Namespace) -> int:
             release_files=release_files,
             root=root,
             engine_root=ENGINE_ROOT,
-            cfg=compliance,
+            cfg=tcompliance,
             excluded=excluded,
         )
         share = str(args.pan_share_url or "")
@@ -334,8 +339,9 @@ def cmd_build(args: argparse.Namespace) -> int:
         )
         log("  完成 " + result["folder"] + " / " + str(result["manifest"]["package_mb"]) + " MB")
         if not result["manifest"]["size_ok"]:
-            log("  警告: 包体积未落在 " + str(topics.get("size_min_mb", 500)) + "-"
-                + str(topics.get("size_max_mb", 2048)) + " MB, 上架前补 Release 包或提高 repo_limit")
+            log("  警告: 包体积未落在 " + str(tcompliance["size_min_mb"]) + "-"
+                + str(tcompliance["size_max_mb"]) + " MB (该专题门槛, 全局默认见 topics.json 顶部), "
+                "上架前补 Release 包或提高 repo_limit")
     write_json_atomic(
         root / "reports" / ("build_" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + ".json"),
         {"schema": "github-bundle-engine/build@1", "summary": summary},
@@ -427,6 +433,8 @@ def cmd_daily(args: argparse.Namespace) -> int:
         )
         if cmd_schedule(schedule_ns) != 0:
             log("  WARN 排程未生成 (首次运行无历史包时正常)")
+    cum = cumulative(Path(args.out) / "reports")
+    log("[盈利] " + summary_line(cum))
     return 0
 
 
@@ -564,6 +572,40 @@ def cmd_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_profit(args: argparse.Namespace) -> int:
+    """网盘盈利闭环: (可选)记当天数 -> 多日累计 -> 阶段判定 -> 目标差距 -> 预测."""
+    root = Path(args.out)
+    if getattr(args, "record", False):
+        cmd_report(args)
+    cum = cumulative(root / "reports")
+    proj = None
+    if cum.get("days"):
+        latest = cum["dailies"][-1]
+        proj = projection(int(latest["effective_links"]), int(latest["orders"]))
+        stamp = str(cum["last_date"])
+        write_json_atomic(root / "reports" / ("revenue_" + stamp + ".json"),
+                          {"schema": "github-bundle-engine/revenue-bundle@1",
+                           "cumulative": cum, "projection": proj})
+        (root / "reports" / ("revenue_" + stamp + ".md")).write_text(
+            render_markdown(cum, proj), encoding="utf-8", newline="\n")
+        log(summary_line(cum))
+        for d in cum["dailies"][-7:]:
+            log("  " + d["date"] + " 链接 " + str(d["effective_links"]) + " 订单 "
+                + str(d["orders"]) + " 合计 " + str(d["total_revenue_cny"]) + " 元 "
+                + ("达标" if d["hit_target_low"] else "未达 40"))
+        log("  网盘收入占比: " + str(cum["pan_share_of_revenue"]) + "% (拉新 "
+            + str(cum["pan_new_users_total"]) + " / 转存 "
+            + str(cum["pan_saves_total"]) + ", T+1)")
+        log("  预测: 当前链接 " + str(latest["effective_links"]) + " -> "
+            + str(proj["scenarios"][-1]["total_low"]) + "-" + str(proj["scenarios"][-1]["total_high"])
+            + " 元/日; 报告: " + str(root / "reports"))
+    else:
+        log(summary_line(cum))
+        log("  记录今天的数据: python -m src.cli profit --record --orders 7 --pan-new 3 "
+            "--pan-saves 24 --pan-commission 33.6 --front-revenue 32.5 --links 20 --out " + str(root))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     # 全局参数同时接受 "cli --out X selftest" 与 "cli selftest --out X" 两种写法.
     # 子命令副本用 SUPPRESS, 未显式给出时保留顶层默认值, 不被子解析器默认值覆盖.
@@ -628,6 +670,19 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("selftest", parents=[common], help="离线夹具跑通全链路")
     s.add_argument("--all-topics", action="store_true", help="覆盖全部 4 个专题")
     s.set_defaults(func=cmd_selftest)
+
+    pf = sub.add_parser("profit", parents=[common], help="网盘盈利核算: 累计/阶段/目标差距/预测")
+    pf.add_argument("--record", action="store_true", help="先用 --orders 等参数写当天日报再核算")
+    pf.add_argument("--date", default="")
+    pf.add_argument("--links", type=int, default=20)
+    pf.add_argument("--exposures", type=int, default=2000)
+    pf.add_argument("--wants", type=int, default=90)
+    pf.add_argument("--orders", type=int, default=7)
+    pf.add_argument("--front-revenue", type=float, default=32.5)
+    pf.add_argument("--pan-new", type=int, default=3)
+    pf.add_argument("--pan-saves", type=int, default=24)
+    pf.add_argument("--pan-commission", type=float, default=33.6)
+    pf.set_defaults(func=cmd_profit)
 
     r = sub.add_parser("report", parents=[common], help="生成每日 90 分钟 SOP 复盘 JSON")
     r.add_argument("--date", default="")

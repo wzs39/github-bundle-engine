@@ -24,7 +24,8 @@ github-bundle-engine/
 │   ├── listing.py         闲鱼标题 / 详情 / 自动发货 / 上架计划 / 日报 JSON
 │   ├── pan.py             推广链接校验 + 回填 _manifest.json + 重生成发货文案
 │   ├── scheduler.py       上架排程: 间隔 >= 60min / 长尾词轮转 / 25 链接封顶
-│   └── cli.py             build / trends / daily / bind-pan / schedule / verify / report / selftest
+│   ├── revenue.py         网盘盈利闭环: 日报核算 -> 多日累计 -> 阶段判定 -> 目标差距 -> 预测
+│   └── cli.py             build / trends / daily / bind-pan / schedule / verify / report / profit / selftest
 ├── templates/
 │   ├── declaration.txt    详情页统一合规声明 (含中文标点, 由文件读取而非硬编码)
 │   └── xianyu_detail.md.tpl
@@ -84,7 +85,11 @@ python -m src.cli build --topic py-office --out OUTPUT_DIR ^
 # 6) 全部 4 个专题
 python -m src.cli build --all --out OUTPUT_DIR
 
-# 7) 生成当天复盘 JSON
+# 7) 网盘盈利核算: 记当天数并出累计/阶段/目标差距/预测 (reports/revenue_<date>.md)
+python -m src.cli profit --record --links 18 --orders 6 --front-revenue 22.8   --pan-new 3 --pan-saves 17 --pan-commission 27.1 --out OUTPUT_DIR
+python -m src.cli profit --out OUTPUT_DIR        # 只分析已记录的日报
+
+# 8) 生成当天复盘 JSON
 python -m src.cli report --out OUTPUT_DIR --orders 7 --pan-new 3 --pan-saves 24 --pan-commission 33.6
 
 # 8) 收益模型验算
@@ -129,6 +134,7 @@ OUTPUT_DIR/
 │   └── listing_plan.json
 ├── reports/
 │   ├── build_<utc>.json
+│   ├── revenue_<date>.json/.md          网盘盈利核算: 累计/占比/阶段/预测
 │   ├── trends_<date>.json               热点发现: 源成败 / 六向评分 / 建议与应用记录
 │   ├── trends_<date>.md                 人读版热词与建议
 │   ├── selftest_daily.json

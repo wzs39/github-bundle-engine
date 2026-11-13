@@ -8,6 +8,7 @@
       "id": "local-ai",
       "name": "本地AI与大模型工具箱",
       "search_tags": [
+        "ai",
         "llm",
         "ollama",
         "comfyui",
@@ -27,10 +28,68 @@
         "最快路径: 先看 01 配环境, 再从 02 挑一个整合包直接双击, 跑通之后回 00 清单按编号找对应源码改配置。每周会往同一文件夹追加新项目, 不用重新买。"
       ],
       "long_tail": [
+        "ai",
+        "claude",
         "本地大模型",
-        "ollama 整合包",
-        "comfyui 中文教程",
-        "AI 工具合集"
+        "ollama 整合包"
+      ],
+      "trend_repos": [
+        {
+          "repo": "alibaba/open-code-review",
+          "stars_today": 206,
+          "description": "Secure, fast, efficient, battle-tested at Alibaba's scale. Hybrid architecture code review tool: deterministic pipelines + LLM Agent, precise line-level comments, built-in multi-language ruleset (NPE, thread-safety, XSS, SQL injection), OpenAI & Anthropic compatible. [Go]",
+          "source": "gh-trending-daily",
+          "url": "https://github.com/alibaba/open-code-review"
+        },
+        {
+          "repo": "GoogleChrome/modern-web-guidance-src",
+          "stars_today": 1875,
+          "description": "Keep your coding agent up to date with the latest web best practices [TypeScript]",
+          "source": "gh-trending-daily",
+          "url": "https://github.com/GoogleChrome/modern-web-guidance-src"
+        },
+        {
+          "repo": "openai/codex-security",
+          "stars_today": 754,
+          "description": "OpenAI's Codex Security CLI and TypeScript SDK for finding, validating, and fixing security vulnerabilities. npm: https://www.npmjs.com/package/@openai/codex-security [TypeScript]",
+          "source": "gh-trending-daily",
+          "url": "https://github.com/openai/codex-security"
+        },
+        {
+          "repo": "ZhuLinsen/daily_stock_analysis",
+          "stars_today": 272,
+          "description": "LLM 驱动的多市场股票智能分析系统：多源行情、实时新闻、决策看板与自动推送，支持零成本定时运行。 LLM-powered multi-market stock analysis system with multi-source market data, real-time news, decision dashboard, automated notifications, and cost-free scheduled runs. [Python]",
+          "source": "gh-trending-daily",
+          "url": "https://github.com/ZhuLinsen/daily_stock_analysis"
+        },
+        {
+          "repo": "backnotprop/plannotator",
+          "stars_today": 100,
+          "description": "The workspace to stay in the loop and on top of agents - shape, decide, plan, annotate, review code, share with team, and send all feedback to agents with one click. [TypeScript]",
+          "source": "gh-trending-daily",
+          "url": "https://github.com/backnotprop/plannotator"
+        },
+        {
+          "repo": "tradermonty/claude-trading-skills",
+          "stars_today": 60,
+          "description": "Claude Code skills for equity investors and traders — market analysis, technical charting, economic calendars, screeners, and trading strategy development. [Python]",
+          "source": "gh-trending-daily",
+          "url": "https://github.com/tradermonty/claude-trading-skills"
+        },
+        {
+          "repo": "tailscale/tailcat",
+          "stars_today": 324,
+          "description": "like netcat, but over Tailscale's data plane, without Tailscale's control plane [Go]",
+          "source": "gh-trending-daily",
+          "url": "https://github.com/tailscale/tailcat"
+        },
+        {
+          "repo": "Likely7/Veyra-NRVideo",
+          "stars_today": 245,
+          "description": "Bring PS5 GTA6 to 120FPS with DLSS 5. An advanced Windows video player and capture enhancement tool featuring real-time preview for videos, images, and capture card sources. Combine AI-powered Super Resolution, DLSS5 image enhancement, and Frame Generation to deliver a next-generation visual experie [C++]",
+          "source": "gh-trending-daily",
+          "url": "https://github.com/Likely7/Veyra-NRVideo"
+        }
       ]
     },
     {
@@ -55,10 +114,68 @@
         "01 文件给的是 pip 清华/阿里源与常见报错处理, 配一次之后基本不用再动。脚本跑不通时先看 01 的 FAQ, 再回订单内留言, 高频问题会补进下一版 01。"
       ],
       "long_tail": [
+        "python",
+        "工具",
         "批量处理 PDF",
-        "Excel 自动化",
-        "Python 脚本合集",
-        "办公效率工具"
+        "Excel 自动化"
+      ],
+      "trend_repos": [
+        {
+          "repo": "ZhuLinsen/daily_stock_analysis",
+          "stars_today": 272,
+          "description": "LLM 驱动的多市场股票智能分析系统：多源行情、实时新闻、决策看板与自动推送，支持零成本定时运行。 LLM-powered multi-market stock analysis system with multi-source market data, real-time news, decision dashboard, automated notifications, and cost-free scheduled runs. [Python]",
+          "source": "gh-trending-daily",
+          "url": "https://github.com/ZhuLinsen/daily_stock_analysis"
+        },
+        {
+          "repo": "tradermonty/claude-trading-skills",
+          "stars_today": 60,
+          "description": "Claude Code skills for equity investors and traders — market analysis, technical charting, economic calendars, screeners, and trading strategy development. [Python]",
+          "source": "gh-trending-daily",
+          "url": "https://github.com/tradermonty/claude-trading-skills"
+        },
+        {
+          "repo": "Tencent-Hunyuan/Hy-MT2",
+          "stars_today": 49,
+          "description": "[Python]",
+          "source": "gh-trending-python",
+          "url": "https://github.com/Tencent-Hunyuan/Hy-MT2"
+        },
+        {
+          "repo": "davila7/claude-code-templates",
+          "stars_today": 65,
+          "description": "Open-source registry and CLI for Claude Code components: agents, commands, skills, hooks, MCPs, settings and mods [Python]",
+          "source": "gh-trending-python",
+          "url": "https://github.com/davila7/claude-code-templates"
+        },
+        {
+          "repo": "avenoxai/avenoxbeyin",
+          "stars_today": 46,
+          "description": "Your AI second brain in one command — open-source Obsidian + Claude Code system with persistent cross-session memory. avenox.lol/beyin.md [Python]",
+          "source": "gh-trending-python",
+          "url": "https://github.com/avenoxai/avenoxbeyin"
+        },
+        {
+          "repo": "asgeirtj/system_prompts_leaks",
+          "stars_today": 83,
+          "description": "Leaked system prompts of ChatGPT, Claude, Gemini and more. The hidden system prompt of every popular chatbot, in full, every version since May 2025. Also Anthropic Claude Code, OpenAI Codex, Google Antigravity, xAI Grok, Meta Muse, Moonshot Kimi, Alibaba Qwen, Z.ai GLM ZCode, MiniMax, Cursor, Perple [Python]",
+          "source": "gh-trending-python",
+          "url": "https://github.com/asgeirtj/system_prompts_leaks"
+        },
+        {
+          "repo": "anthropics/claude-plugins-official",
+          "stars_today": 134,
+          "description": "Official, Anthropic-managed directory of high quality Claude Code Plugins. [Python]",
+          "source": "gh-trending-python",
+          "url": "https://github.com/anthropics/claude-plugins-official"
+        },
+        {
+          "repo": "Alishahryar1/free-claude-code",
+          "stars_today": 895,
+          "description": "Use Claude Code, Codex, Antigravity, VSCode, Pi, and OpenCode (and 6 other harnesses) for free (1.3B+ free tokens) from your terminal, app, IDE, or phone, and now from the browser with native browser sessions (multi-harness + multi-model) like OpenClaw (voice supported + ToS friendly) [Python]",
+          "source": "gh-trending-python",
+          "url": "https://github.com/Alishahryar1/free-claude-code"
+        }
       ]
     },
     {
@@ -126,7 +243,7 @@
         "考研",
         "408",
         "cs-books",
-        "interview"
+        "考研笔记"
       ],
       "extra_query": "",
       "min_stars": 100,
@@ -142,10 +259,69 @@
         "01 文件给出 PDF 阅读与打印排版的小工具清单。仓库里以笔记和索引为主, 真题类内容请以官方出版渠道为准, 这里只收开源整理与工具。"
       ],
       "long_tail": [
+        "考研",
+        "备考",
         "考研资料合集",
-        "408 笔记",
-        "复试经验",
-        "考研工具"
+        "408 笔记"
+      ],
+      "size_min_mb": 150,
+      "trend_repos": [
+        {
+          "repo": "zhanwen/MathModel",
+          "stars_today": 12447,
+          "description": "研究生数学建模，本科生数学建模、数学建模竞赛优秀论文，数学建模算法，LaTeX论文模板，算法思维导图，参考书籍，Matlab软件教程，PPT [algorithm] [math] [mathematics] [matlab] [model]",
+          "source": "gh-search-kaoyan",
+          "url": "https://github.com/zhanwen/MathModel"
+        },
+        {
+          "repo": "alchaincyf/zhangxuefeng-skill",
+          "stars_today": 10761,
+          "description": "张雪峰.skill — 张雪峰的认知操作系统。高考志愿/考研/职业规划的实战思维框架。由女娲.skill生成。 [agent-skills] [career-planning] [claude-code] [claude-code-skills] [claude-skills] [codex]",
+          "source": "gh-search-kaoyan",
+          "url": "https://github.com/alchaincyf/zhangxuefeng-skill"
+        },
+        {
+          "repo": "csseky/cskaoyan",
+          "stars_today": 9337,
+          "description": "提供计算机考研和软件工程考研专业的各个学校 考研真题 [cskaoyan] [csseky] [kaoyancs]",
+          "source": "gh-search-kaoyan",
+          "url": "https://github.com/csseky/cskaoyan"
+        },
+        {
+          "repo": "ddy-ddy/cs-408",
+          "stars_today": 6338,
+          "description": "计算机考研专业课程408相关的复习经验，资源和OneNote笔记",
+          "source": "gh-search-kaoyan",
+          "url": "https://github.com/ddy-ddy/cs-408"
+        },
+        {
+          "repo": "CodePanda66/CSPostgraduate-408",
+          "stars_today": 5684,
+          "description": "💯  CSPostgraduate 计算机考研 408 专业课资料及真题资源 [408] [computernetwork] [computerorganization] [cspostgraduate] [datastructure] [kaoyan]",
+          "source": "gh-search-kaoyan",
+          "url": "https://github.com/CodePanda66/CSPostgraduate-408"
+        },
+        {
+          "repo": "xiaolei565/aimto408",
+          "stars_today": 4628,
+          "description": "🇨🇳🇨🇳🇨🇳这个repo是为了那些准备死磕 计算机考研 4️⃣0️⃣8️⃣的考研党准备的，当然你如果4门课中的部分也可以看看，欢迎star📝📝📝，祝你们一战成硕🏆🏆🏆~~（更新23年大纲变化----2023年408和数学基本无变化） [408] [cs] [cskaoyan] [kaoyan]",
+          "source": "gh-search-kaoyan",
+          "url": "https://github.com/xiaolei565/aimto408"
+        },
+        {
+          "repo": "kajweb/dict",
+          "stars_today": 3804,
+          "description": "英语字典 英语词库 字典词库 四级单词 六级单词 考研单词 雅思 托福 SAT GMAT TOEFL GRE",
+          "source": "gh-search-kaoyan",
+          "url": "https://github.com/kajweb/dict"
+        },
+        {
+          "repo": "xxlllq/system_architect",
+          "stars_today": 8885,
+          "description": ":100: 2026年系统架构设计师（软考高级）备考资料。 [examination] [ruankao]",
+          "source": "gh-search-gaokao",
+          "url": "https://github.com/xxlllq/system_architect"
+        }
       ]
     },
     {
@@ -172,10 +348,34 @@
         "提醒写在前面: 分数线与招生计划以省考试院当年发布为准, 合集里的开源数据只用于提前建立概念和缩小范围。"
       ],
       "long_tail": [
+        "高考",
+        "真题",
         "高考志愿填报",
-        "学科笔记",
-        "一分一段表",
-        "学习资源包"
+        "学科笔记"
+      ],
+      "size_min_mb": 100,
+      "trend_repos": [
+        {
+          "repo": "alchaincyf/zhangxuefeng-skill",
+          "stars_today": 10761,
+          "description": "张雪峰.skill — 张雪峰的认知操作系统。高考志愿/考研/职业规划的实战思维框架。由女娲.skill生成。 [agent-skills] [career-planning] [claude-code] [claude-code-skills] [claude-skills] [codex]",
+          "source": "gh-search-kaoyan",
+          "url": "https://github.com/alchaincyf/zhangxuefeng-skill"
+        },
+        {
+          "repo": "csseky/cskaoyan",
+          "stars_today": 9337,
+          "description": "提供计算机考研和软件工程考研专业的各个学校 考研真题 [cskaoyan] [csseky] [kaoyancs]",
+          "source": "gh-search-kaoyan",
+          "url": "https://github.com/csseky/cskaoyan"
+        },
+        {
+          "repo": "CodePanda66/CSPostgraduate-408",
+          "stars_today": 5684,
+          "description": "💯  CSPostgraduate 计算机考研 408 专业课资料及真题资源 [408] [computernetwork] [computerorganization] [cspostgraduate] [datastructure] [kaoyan]",
+          "source": "gh-search-kaoyan",
+          "url": "https://github.com/CodePanda66/CSPostgraduate-408"
+        }
       ]
     },
     {
@@ -203,10 +403,69 @@
         "01 文件给 Anki 与词库导入的中文步骤。所有内容来自开源社区, 商业课程与版权材料不收; 版权敏感的词书资源若仓库无明确授权, 会在合规闸被过滤掉。"
       ],
       "long_tail": [
+        "英语",
+        "english",
         "背单词工具",
-        "英语学习资源",
-        "anki 卡组",
-        "雅思托福资料"
+        "英语学习资源"
+      ],
+      "size_min_mb": 150,
+      "trend_repos": [
+        {
+          "repo": "higgsfield-ai/higgsfield",
+          "stars_today": 2,
+          "description": "Fault-tolerant, highly scalable GPU orchestration, and a machine learning framework designed for training models with billions to trillions of parameters [Jupyter Notebook]",
+          "source": "gh-trending-jupyter",
+          "url": "https://github.com/higgsfield-ai/higgsfield"
+        },
+        {
+          "repo": "fighting41love/funNLP",
+          "stars_today": 84570,
+          "description": "中英文敏感词、语言检测、中外手机/电话归属地/运营商查询、名字推断性别、手机号抽取、身份证抽取、邮箱抽取、中日文人名库、中文缩写库、拆字词典、词汇情感值、停用词、反动词表、暴恐词表、繁简体转换、英文模拟中文发音、汪峰歌词生成器、职业名称词库、同义词库、反义词库、否定词库、汽车品牌词库、汽车零件词库、连续英文切割、各种中文词向量、公司名字大全、古诗词库、IT词库、财经词库、成语词库、地名词库、历史名人词库、诗词词库、医学词库、饮食词库、法律词库、汽车词库、动物词库、中文聊天语料、中文谣言数据、百度中文问答数据集、句子相似度匹配算法集合、bert资源、文本生成&摘要相关工具、cocoNLP信息抽取",
+          "source": "gh-search-kaoyan",
+          "url": "https://github.com/fighting41love/funNLP"
+        },
+        {
+          "repo": "kajweb/dict",
+          "stars_today": 3804,
+          "description": "英语字典 英语词库 字典词库 四级单词 六级单词 考研单词 雅思 托福 SAT GMAT TOEFL GRE",
+          "source": "gh-search-kaoyan",
+          "url": "https://github.com/kajweb/dict"
+        },
+        {
+          "repo": "Ebazhanov/linkedin-skill-assessments-quizzes",
+          "stars_today": 28882,
+          "description": "Full reference of LinkedIn answers 2024 for skill assessments (aws-lambda, rest-api, javascript, react, git, html, jquery, mongodb, java, Go, python, machine-learning, power-point) linkedin excel test lösungen, linkedin machine learning test LinkedIn test questions and answers [answers] [assessment] [english] [exam] [france] [german]",
+          "source": "gh-search-english",
+          "url": "https://github.com/Ebazhanov/linkedin-skill-assessments-quizzes"
+        },
+        {
+          "repo": "RealKai42/qwerty-learner",
+          "stars_today": 23766,
+          "description": "为键盘工作者设计的单词记忆与英语肌肉记忆锻炼软件 / Words learning and English muscle memory training software designed for keyboard workers [english-learning] [typing] [typing-game] [typing-practice] [typingspeedtest]",
+          "source": "gh-search-english",
+          "url": "https://github.com/RealKai42/qwerty-learner"
+        },
+        {
+          "repo": "cuixueshe/earthworm",
+          "stars_today": 11227,
+          "description": "Learning English through the method of constructing sentences with conjunctions",
+          "source": "gh-search-english",
+          "url": "https://github.com/cuixueshe/earthworm"
+        },
+        {
+          "repo": "mengxi-ream/read-frog",
+          "stars_today": 10420,
+          "description": "🐸 Read Frog - Open-source AI language learning & flashcards, an Immersive Translate alternative | 🐸 陪读蛙 - 开源 AI 语言学习与闪词卡，沉浸式翻译替代 [anki] [bilingual-subtitles] [browser-extension] [chinese] [chrome-extension] [deepseek]",
+          "source": "gh-search-english",
+          "url": "https://github.com/mengxi-ream/read-frog"
+        },
+        {
+          "repo": "WenyuChiou/awesome-agentic-ai-zh",
+          "stars_today": 8765,
+          "description": "A trilingual (繁中 / English / 简中) learning roadmap for agentic AI: from LLM basics to multi-agent systems, with 240+ curated resources and hands-on examples. 中文 AI agent 學習地圖。 [agentic-ai] [agentic-workflows] [ai-agent] [ai-agents] [awesome-list] [chinese-llm]",
+          "source": "gh-search-english",
+          "url": "https://github.com/WenyuChiou/awesome-agentic-ai-zh"
+        }
       ]
     },
     {
@@ -234,22 +493,80 @@
         "说明写在前面: 商业软件本体与破解激活类资源不在合集内, 这类仓库会在合规闸被自动过滤; 开源替代覆盖课程作业与入门学习的绝大多数操作, 深度商业插件需求请走官方学生授权渠道。"
       ],
       "long_tail": [
+        "ps",
+        "cad",
         "PS 替代软件",
-        "CAD 开源",
-        "SolidWorks 替代",
-        "软件安装教程"
+        "CAD 开源"
+      ],
+      "trend_repos": [
+        {
+          "repo": "openai/codex-security",
+          "stars_today": 754,
+          "description": "OpenAI's Codex Security CLI and TypeScript SDK for finding, validating, and fixing security vulnerabilities. npm: https://www.npmjs.com/package/@openai/codex-security [TypeScript]",
+          "source": "gh-trending-daily",
+          "url": "https://github.com/openai/codex-security"
+        },
+        {
+          "repo": "Likely7/Veyra-NRVideo",
+          "stars_today": 245,
+          "description": "Bring PS5 GTA6 to 120FPS with DLSS 5. An advanced Windows video player and capture enhancement tool featuring real-time preview for videos, images, and capture card sources. Combine AI-powered Super Resolution, DLSS5 image enhancement, and Frame Generation to deliver a next-generation visual experie [C++]",
+          "source": "gh-trending-daily",
+          "url": "https://github.com/Likely7/Veyra-NRVideo"
+        },
+        {
+          "repo": "davila7/claude-code-templates",
+          "stars_today": 65,
+          "description": "Open-source registry and CLI for Claude Code components: agents, commands, skills, hooks, MCPs, settings and mods [Python]",
+          "source": "gh-trending-python",
+          "url": "https://github.com/davila7/claude-code-templates"
+        },
+        {
+          "repo": "ahujasid/mcp-for-blender",
+          "stars_today": 140,
+          "description": "Community plugin to control Blender 3D with any LLM of your choice. Not affiliated with the official Blender Foundation. [Python]",
+          "source": "gh-trending-python",
+          "url": "https://github.com/ahujasid/mcp-for-blender"
+        },
+        {
+          "repo": "zhanwen/MathModel",
+          "stars_today": 12447,
+          "description": "研究生数学建模，本科生数学建模、数学建模竞赛优秀论文，数学建模算法，LaTeX论文模板，算法思维导图，参考书籍，Matlab软件教程，PPT [algorithm] [math] [mathematics] [matlab] [model]",
+          "source": "gh-search-kaoyan",
+          "url": "https://github.com/zhanwen/MathModel"
+        },
+        {
+          "repo": "cirosantilli/x86-bare-metal-examples",
+          "stars_today": 5448,
+          "description": "Dozens of minimal operating systems to learn x86 system programming. Tested on Ubuntu 17.10 host in QEMU 2.10 and real hardware. Userland cheat at: https://github.com/cirosantilli/linux-kernel-module-cheat#userland-assembly ARM baremetal setup at: https://github.com/cirosantilli/linux-kernel-module- [assembly] [bare-metal] [baremetal] [x64] [x86] [x86-64]",
+          "source": "gh-search-kaoyan",
+          "url": "https://github.com/cirosantilli/x86-bare-metal-examples"
+        },
+        {
+          "repo": "robbietilton/Compositor",
+          "stars_today": 18653,
+          "description": "The Photoshop alternative for Mac",
+          "source": "gh-search-design",
+          "url": "https://github.com/robbietilton/Compositor"
+        },
+        {
+          "repo": "Diolinux/PhotoGIMP",
+          "stars_today": 18555,
+          "description": "A Patch for GIMP 3+ for Photoshop Users",
+          "source": "gh-search-design",
+          "url": "https://github.com/Diolinux/PhotoGIMP"
+        }
       ]
     },
     {
       "id": "hot-oss",
       "name": "热门开源软件装机精选",
       "search_tags": [
+        "windows",
         "media-player",
         "note-taking",
         "download-manager",
         "file-manager",
-        "office-suite",
-        "launcher"
+        "office-suite"
       ],
       "extra_query": "",
       "min_stars": 500,
@@ -265,10 +582,62 @@
         "01 文件给常见运行库与关联设置的处理办法。全部开源、保留原仓库地址与协议, 追求最新版本时按 00 清单的仓库地址自行取 Release 即可。"
       ],
       "long_tail": [
+        "windows",
+        "video player",
         "开源软件推荐",
-        "装机必备",
-        "免费办公软件",
-        "视频播放器"
+        "装机必备"
+      ],
+      "size_min_mb": 300,
+      "trend_repos": [
+        {
+          "repo": "Likely7/Veyra-NRVideo",
+          "stars_today": 245,
+          "description": "Bring PS5 GTA6 to 120FPS with DLSS 5. An advanced Windows video player and capture enhancement tool featuring real-time preview for videos, images, and capture card sources. Combine AI-powered Super Resolution, DLSS5 image enhancement, and Frame Generation to deliver a next-generation visual experie [C++]",
+          "source": "gh-trending-daily",
+          "url": "https://github.com/Likely7/Veyra-NRVideo"
+        },
+        {
+          "repo": "avenoxai/avenoxbeyin",
+          "stars_today": 46,
+          "description": "Your AI second brain in one command — open-source Obsidian + Claude Code system with persistent cross-session memory. avenox.lol/beyin.md [Python]",
+          "source": "gh-trending-python",
+          "url": "https://github.com/avenoxai/avenoxbeyin"
+        },
+        {
+          "repo": "massgravel/Microsoft-Activation-Scripts",
+          "stars_today": 198890,
+          "description": "Open-source Windows and Office activator featuring HWID, Ohook, TSforge, and Online KMS activation methods, along with advanced troubleshooting. [activator] [hwid] [kms] [kms38] [massgrave] [massgravel]",
+          "source": "gh-search-popular-oss",
+          "url": "https://github.com/massgravel/Microsoft-Activation-Scripts"
+        },
+        {
+          "repo": "jlevy/the-art-of-command-line",
+          "stars_today": 162746,
+          "description": "Master the command line, in one page [bash] [documentation] [linux] [macos] [unix] [windows]",
+          "source": "gh-search-popular-oss",
+          "url": "https://github.com/jlevy/the-art-of-command-line"
+        },
+        {
+          "repo": "microsoft/PowerToys",
+          "stars_today": 140952,
+          "description": "Microsoft PowerToys is a collection of utilities that supercharge productivity and customization on Windows [advanced-paste] [color-picker] [command-palette] [desktop] [fancyzones] [keyboard-manager]",
+          "source": "gh-search-popular-oss",
+          "url": "https://github.com/microsoft/PowerToys"
+        },
+        {
+          "repo": "microsoft/terminal",
+          "stars_today": 105379,
+          "description": "The new Windows Terminal and the original Windows console host, all in the same place! [cmd] [command-line] [console] [contributions-welcome] [good-first-issue] [hacktoberfest]",
+          "source": "gh-search-popular-oss",
+          "url": "https://github.com/microsoft/terminal"
+        },
+        {
+          "repo": "solidSpoon/DashPlayer",
+          "stars_today": 4646,
+          "description": "为英语学习者量身打造的视频播放器，助你通过观看视频、沉浸真实语境，轻松提升英语水平。#美剧 #播放器 #听力 [app] [bo-fang-qi] [english] [gpt] [learning] [mei-ju]",
+          "source": "gh-search-english",
+          "url": "https://github.com/solidSpoon/DashPlayer"
+        }
       ]
     }
   ]

@@ -24,7 +24,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from .compliance import check_text
+from .compliance import check_text, term_hit
 from .downloader import write_json_atomic
 
 REPORT_SCHEMA = "github-bundle-engine/trends@1"
@@ -298,7 +298,7 @@ def repo_candidates(items: list[HotItem], block_terms: list[str]) -> list[dict[s
         if not item.repo or item.repo in seen:
             continue
         hay = item_haystack(item)
-        if any(str(b).lower() in hay for b in block_terms):
+        if any(term_hit(hay, str(b).lower()) for b in block_terms):
             continue
         seen.add(item.repo)
         out.append(
@@ -336,7 +336,7 @@ def propose_updates(
 
     def dirty(word: str) -> bool:
         low = word.lower()
-        return bool(check_text(word)) or any(b in low for b in block_terms if b)
+        return bool(check_text(word)) or any(term_hit(low, b) for b in block_terms if b)
 
     apply_cfg = dict(trends_cfg.get("apply") or {})
     max_tags = int(apply_cfg.get("max_search_tags") or 6)

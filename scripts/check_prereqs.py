@@ -25,6 +25,25 @@ PLACEHOLDER = "["
 SECRETS = ("GITHUB_TOKEN", "PAN_PROMOTE_UID", "XIANYU_AUTO_REPLY_PLUGIN")
 
 
+def _load_dotenv() -> None:
+    """与 run_daily.ps1 对齐: 本地 .env 存在时加载进环境 (不覆盖已有值).
+
+    否则 .env 已填好、计划任务能跑, 自检却永远报 WAIT, 误导判断.
+    """
+    env_path = ENGINE_ROOT / ".env"
+    if not env_path.is_file():
+        return
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip()
+        if key in SECRETS and value and not os.environ.get(key, "").strip():
+            os.environ[key] = value
+
+
 def _env_ready(key: str) -> tuple[bool, str]:
     value = os.environ.get(key, "").strip()
     if not value:
@@ -157,7 +176,7 @@ def check(out_dir: str) -> dict[str, Any]:
         {"id": "D1", "name": "Python", "ok": sys.version_info >= (3, 9), "note": sys.version.split()[0]},
         {"id": "D2", "name": "GitHub CLI", "ok": gh_ok, "note": gh_note},
         {"id": "D3", "name": "离线闭环", "ok": (ENGINE_ROOT / "src" / "cli.py").is_file(), "note": "selftest / verify / schedule / report 可用"},
-        {"id": "D4", "name": "回归测试", "ok": (ENGINE_ROOT / "tests" / "test_engine.py").is_file(), "note": "42 项离线回归"},
+        {"id": "D4", "name": "回归测试", "ok": (ENGINE_ROOT / "tests" / "test_engine.py").is_file(), "note": "56 项离线回归"},
     ]
 
     hard_pending = [x["id"] for x in a if not x["ok"] and not x.get("manual")]
@@ -179,6 +198,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", default="OUTPUT_DIR")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
+    _load_dotenv()
     result = check(args.out)
 
     if args.json:

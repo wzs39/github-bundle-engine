@@ -37,6 +37,20 @@ def _haystack(repo: Repo) -> str:
     ).lower()
 
 
+def term_hit(text: str, needle: str) -> bool:
+    """黑名单命中判定. 短 ASCII 词用词边界匹配, 避免 "c2" 误伤 "abc2"/"c2c" 这类内容.
+
+    中文等无词界语言直接子串匹配; 长 ASCII 词 (>=4 字符) 子串足够精确;
+    短 ASCII 词 (<=3 字符) 要求两侧不是字母数字, 防止 "c2" 命中随机哈希/型号.
+    """
+    if not needle:
+        return False
+    if re.search(r"[\u4e00-\u9fff]", needle) or len(needle) > 3:
+        return needle in text
+    pattern = r"(?<![a-z0-9])" + re.escape(needle) + r"(?![a-z0-9])"
+    return re.search(pattern, text) is not None
+
+
 def screen_repo(repo: Repo, cfg: dict[str, Any]) -> tuple[bool, str]:
     """返回 (是否收录, 原因). 任一红线命中即排除并记录具体原因."""
     # topic 分类先判: 显式声明的敏感分类优先于文本子串, 原因更精确.
@@ -47,7 +61,7 @@ def screen_repo(repo: Repo, cfg: dict[str, Any]) -> tuple[bool, str]:
     text = _haystack(repo)
     for term in cfg.get("block_terms", []):
         needle = str(term).lower()
-        if needle and needle in text:
+        if needle and term_hit(text, needle):
             return False, "命中内容黑名单: " + str(term)
     allowed = {str(x) for x in cfg.get("allowed_license_spdx", [])}
     if allowed and repo.license_key not in allowed:

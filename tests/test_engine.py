@@ -35,11 +35,12 @@ from src.downloader import extract_source  # noqa: E402
 from src.gh_client import Repo  # noqa: E402
 from src.listing import (  # noqa: E402
     render_auto_reply,
+    render_daily_report,
     render_detail,
     render_listing_plan,
     render_title,
 )
-from src.packer import safe_name, render_project_manifest  # noqa: E402
+from src.packer import build_topic, safe_name, render_project_manifest  # noqa: E402
 from src.pan import bind as bind_pan  # noqa: E402
 from src.pan import find_manifests, validate_extract_code, validate_share_url  # noqa: E402
 from src.scheduler import build_schedule, rotate_keywords, render_schedule_md  # noqa: E402
@@ -52,6 +53,8 @@ from src.trends import (  # noqa: E402
     repo_candidates,
     score_verticals,
 )
+from src.economics import blend_price as _blend_price  # noqa: E402
+from src.revenue import cumulative, profit_from_report, projection  # noqa: E402
 from scripts import economics  # noqa: E402
 
 CFG = load_config(ENGINE_ROOT / "config" / "compliance.json")
@@ -92,6 +95,19 @@ class TestScreenRepo(unittest.TestCase):
 
     def test_block_term_rejects(self) -> None:
         ok, reason = screen_repo(repo(description="a pentest toolkit"), CFG)
+        self.assertFalse(ok)
+        self.assertIn("黑名单", reason)
+
+    def test_short_block_term_uses_word_boundary(self) -> None:
+        """短 ASCII 黑名单词 ("c2") 不能子串误伤随机内容, 词边界内才拦."""
+        ok, _ = screen_repo(repo(description="C2C 二手交易平台聚合与比价工具"), CFG)
+        self.assertTrue(ok, "C2C 不应被 c2 子串误伤")
+        ok, reason = screen_repo(repo(description="botnet c2 server framework"), CFG)
+        self.assertFalse(ok)
+        self.assertIn("黑名单", reason)  # botnet 或 c2 任一命中即拦
+
+    def test_chinese_block_term_still_substring(self) -> None:
+        ok, reason = screen_repo(repo(description="游戏私服架设教程"), CFG)
         self.assertFalse(ok)
         self.assertIn("黑名单", reason)
 
@@ -415,6 +431,109 @@ class TestScheduler(unittest.TestCase):
             base = Path(td) / "reports"
             self.assertTrue((base / "schedule_2026-09-17.json").is_file())
             self.assertTrue((base / "schedule_2026-09-17.md").is_file())
+
+
+class TestRevenue(unittest.TestCase):
+    """网盘盈利闭环: 单日核算 -> 多日累计 -> 预测, 全离线."""
+
+    def _report(self, date, links, orders, front, new_users, saves, commission):
+        return render_daily_report(
+            date=date, link_count=links, exposures=2000, wants=90,
+            orders=orders, front_revenue=front,
+            pan_new_users=new_users, pan_saves=saves, pan_commission=commission,
+        )
+
+    def test_profit_from_report(self) -> None:
+        row = profit_from_report(self._report("2026-11-14", 20, 8, 30.4, 3, 26, 33.6))
+        self.assertEqual(30.4, row["front_revenue_cny"])
+        self.assertEqual(33.6, row["pan_commission_cny"])
+        self.assertEqual(64.0, row["total_revenue_cny"])
+        self.assertTrue(row["commission_plausible"], "3 拉新 + 26 转存的佣金应在区间内")
+        self.assertEqual("第二阶段·爆款", row["stage"])
+        self.assertEqual("第二阶段·20 链接",
+                         profit_from_report(self._report("2026-11-14", 15, 4, 6.8, 2, 9, 9.2))["stage"])
+        self.assertTrue(row["hit_target_low"])
+        # 当天无拉新/转存时佣金视为 T+1 结算到账, 不做区间校验
+        carried = profit_from_report(self._report("2026-11-14", 20, 1, 0.99, 0, 0, 88.0))
+        self.assertTrue(carried["commission_plausible"])
+        # 有活动但佣金远超区间上限时给出不可信标记
+        bad = profit_from_report(self._report("2026-11-14", 20, 1, 0.99, 1, 1, 88.0))
+        self.assertFalse(bad["commission_plausible"])
+
+    def test_cumulative_and_projection(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            reports = Path(td) / "reports"
+            from src.downloader import write_json_atomic
+            write_json_atomic(reports / "daily_2026-11-13.json",
+                              self._report("2026-11-13", 15, 4, 6.8, 2, 9, 9.2))
+            write_json_atomic(reports / "daily_2026-11-14.json",
+                              self._report("2026-11-14", 20, 8, 30.4, 3, 26, 33.6))
+            cum = cumulative(reports)
+            self.assertEqual(2, cum["days"])
+            self.assertEqual(37.2, cum["front_revenue_total_cny"])
+            self.assertEqual(42.8, cum["pan_commission_total_cny"])
+            self.assertEqual(80.0, cum["total_revenue_cny"])
+            self.assertEqual(40.0, cum["daily_avg_cny"])
+            self.assertTrue(cum["daily_avg_hit_target_low"])
+            self.assertEqual("2026-11-14", cum["best_day"]["date"])
+            proj = projection(20, 8)
+            names = [s["name"] for s in proj["scenarios"]]
+            self.assertIn("当前运营外推", names)
+
+    def test_cli_profit_record_then_analyze(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            rc = cli.main([
+                "profit", "--record", "--links", "20", "--orders", "8",
+                "--front-revenue", "30.4", "--pan-new", "3",
+                "--pan-saves", "26", "--pan-commission", "33.6", "--out", td,
+            ])
+            self.assertEqual(0, rc)
+            self.assertTrue(list((Path(td) / "reports").glob("revenue_*.md")))
+            self.assertTrue(list((Path(td) / "reports").glob("daily_*.json")))
+
+
+class TestPerTopicSizeGate(unittest.TestCase):
+    """体积门槛支持专题级覆盖: 笔记类专题到不了全局 500MB 时不再永远 FAIL."""
+
+    def test_size_gate_follows_cfg(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            cfg = dict(CFG)
+            cfg["size_min_mb"] = 0
+            cfg["size_max_mb"] = 2048
+            rc_repo = repo(full_name="acme/tiny-notes", description="考研笔记整理",
+                           topics=["kaoyan", "notes"])
+            tar_path, meta = cli.make_fixture_archive(root / "cache", rc_repo)
+            result = build_topic(
+                topic={"id": "kaoyan", "name": "测试专题", "price": 1.99,
+                       "price_tier": "走量款", "audience": "测试客群",
+                       "selling_point": "中文清单 | 保留 LICENSE",
+                       "long_tail": ["考研笔记"], "intro": ["测试导语"]},
+                repos=[rc_repo],
+                archives=[(rc_repo, tar_path, meta)],
+                release_files={},
+                root=root,
+                engine_root=ENGINE_ROOT,
+                cfg=cfg,
+                excluded=[],
+            )
+            self.assertTrue(result["manifest"]["size_ok"], "size_min_mb=0 时极小包应达标")
+            cfg_bad = dict(cfg)
+            cfg_bad["size_min_mb"] = 1000
+            result_bad = build_topic(
+                topic={"id": "kaoyan", "name": "测试专题", "price": 1.99,
+                       "price_tier": "走量款", "audience": "测试客群",
+                       "selling_point": "中文清单 | 保留 LICENSE",
+                       "long_tail": ["考研笔记"], "intro": ["测试导语"]},
+                repos=[rc_repo],
+                archives=[(rc_repo, tar_path, meta)],
+                release_files={},
+                root=root,
+                engine_root=ENGINE_ROOT,
+                cfg=cfg_bad,
+                excluded=[],
+            )
+            self.assertFalse(result_bad["manifest"]["size_ok"], "size_min_mb=1000 时应不达标")
 
 
 class TestTrends(unittest.TestCase):
