@@ -1,0 +1,84 @@
+{
+  "version": "2026.1",
+  "currency": "CNY",
+  "size_min_mb": 500,
+  "size_max_mb": 2048,
+  "topics": [
+    {
+      "id": "local-ai",
+      "name": "本地AI与大模型工具箱",
+      "search_tags": ["llm", "ollama", "comfyui", "ai-agent"],
+      "extra_query": "topic:llm",
+      "min_stars": 3000,
+      "pushed_after_days": 365,
+      "repo_limit": 12,
+      "price": 6.9,
+      "price_tier": "利润款",
+      "audience": "想零成本本地部署 AI 对话与绘图工具的泛科技用户",
+      "selling_point": "整合包免配置 | 中文部署清单 | 持续更新",
+      "intro": [
+        "想在本机跑一个能对话、能画图的模型, 真正卡住人的从来不是显卡, 而是找不齐一套互相兼容的工具: 运行时、模型管理、绘图前端、界面壳各在一处, 版本一错就全崩。",
+        "这份合集按「先跑起来 -> 再换模型 -> 最后接界面」的顺序编排, 00 清单给出每个项目的 Star 数、协议与落地目录, 01 文件把 Python/Node 与国内镜像源一次配好, 02 目录放官方 Release 的 Windows 安装包, 03 目录是完整源码与原始 LICENSE。",
+        "最快路径: 先看 01 配环境, 再从 02 挑一个整合包直接双击, 跑通之后回 00 清单按编号找对应源码改配置。每周会往同一文件夹追加新项目, 不用重新买。"
+      ],
+      "long_tail": ["本地大模型", "ollama 整合包", "comfyui 中文教程", "AI 工具合集"]
+    },
+    {
+      "id": "py-office",
+      "name": "Python办公自动化神器",
+      "search_tags": ["automation", "pdf-tools", "python-scripts"],
+      "extra_query": "language:python",
+      "min_stars": 1500,
+      "pushed_after_days": 540,
+      "repo_limit": 15,
+      "price": 0.99,
+      "price_tier": "引流拉新款",
+      "audience": "职场人与研究生 批量处理文档 音视频下载 数据清洗",
+      "selling_point": "开箱即用脚本 | 中文注释 | 国内镜像配置",
+      "intro": [
+        "批量改名、合并 PDF、从表格里洗数据、把网页视频存成本地文件 —— 这些活儿每次都只占十几分钟, 但每次都要重新搜一遍命令, 最耗的其实是「找工具」这一步。",
+        "这里按使用场景收了同一类高星脚本: 文档、表格、下载、清洗。每个项目都保留原 LICENSE 与原仓库地址, 00 清单里可以直接按 Star 数和摘要挑, 03 目录按编号放好源码。",
+        "01 文件给的是 pip 清华/阿里源与常见报错处理, 配一次之后基本不用再动。脚本跑不通时先看 01 的 FAQ, 再回订单内留言, 高频问题会补进下一版 01。"
+      ],
+      "long_tail": ["批量处理 PDF", "Excel 自动化", "Python 脚本合集", "办公效率工具"]
+    },
+    {
+      "id": "grad-project",
+      "name": "毕设与全栈管理系统模板",
+      "search_tags": ["spring-boot", "vue", "management-system"],
+      "extra_query": "topic:spring-boot",
+      "min_stars": 800,
+      "pushed_after_days": 730,
+      "repo_limit": 10,
+      "price": 9.9,
+      "price_tier": "高客单款",
+      "audience": "计算机相关专业学生 课程设计参考架构与后台 UI 模板",
+      "selling_point": "前后端完整工程 | 数据库脚本 | 部署说明",
+      "intro": [
+        "课程设计和毕设最难的不是写业务, 是第一天: 后端用什么骨架、前端怎么接、数据库表从哪来、登录和权限怎么起头。自己从零搭一遍, 两周就没了。",
+        "这份合集挑的是结构完整、能直接读的管理系统工程: 后端分层、前端路由、菜单权限、SQL 脚本都在。00 清单标了协议和 Star, 03 目录按编号排好, 逐个对照着看架构比看零散博客快得多。",
+        "01 文件覆盖 JDK/Maven/Node 国内源与端口占用等常见问题。建议先跑通一个工程, 再按需替换其中的业务模块; 引用时请保留原项目 LICENSE 与作者链接。"
+      ],
+      "long_tail": ["毕业设计 源码", "springboot vue 后台", "管理系统模板", "课设参考"]
+    },
+    {
+      "id": "portfolio",
+      "name": "高颜值简历与个人主页",
+      "search_tags": ["portfolio", "resume", "hexo", "hugo-theme"],
+      "extra_query": "topic:portfolio",
+      "min_stars": 500,
+      "pushed_after_days": 730,
+      "repo_limit": 15,
+      "price": 1.99,
+      "price_tier": "走量款",
+      "audience": "应届毕业生 低成本搭建个人作品集与技术博客",
+      "selling_point": "一键生成静态站 | 中文配置说明 | 多套主题",
+      "intro": [
+        "投简历时附一个能打开的个人主页, 比在 PDF 里写十行「熟悉 XX」更有说服力。但为这一页去学一整套前端框架, 性价比太低。",
+        "这里收的是高星简历/作品集/博客主题与静态站生成器: 多数改一个配置文件就能换成自己的内容, 不需要后端, 也不需要买服务器。00 清单按 Star 和协议列好, 03 目录直接是源码。",
+        "01 文件给 Node 与 npm 国内镜像命令。挑一套顺眼的 -> 改配置里的姓名/项目/链接 -> 本地预览 -> 导出静态文件, 整个过程通常半小时内能走完。"
+      ],
+      "long_tail": ["个人主页模板", "简历网页", "hexo 主题", "hugo 博客"]
+    }
+  ]
+}

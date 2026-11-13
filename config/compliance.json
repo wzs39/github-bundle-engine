@@ -1,0 +1,19 @@
+{
+  "block_terms": [
+    "pentest", "exploit", "payload", "malware", "ransomware", "keylogger",
+    "botnet", "c2", "reverse-shell", "webshell", "keygen", "crack", "keygen",
+    "bypass-license", "proxy", "vpn", "shadowsocks", "clash", "翻墙",
+    "渗透", "攻击", "木马", "破解", "接码", "刷单", "私服", "盗版"
+  ],
+  "block_topics": ["pentesting", "malware", "exploit", "proxy", "vpn"],
+  "allowed_license_spdx": [
+    "MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "GPL-2.0",
+    "GPL-3.0", "LGPL-2.1", "LGPL-3.0", "MPL-2.0", "ISC", "Unlicense",
+    "AGPL-3.0", "CC0-1.0"
+  ],
+  "license_filenames": ["LICENSE", "LICENSE.md", "LICENSE.txt", "COPYING", "COPYING.md", "LICENCE"],
+  "release_asset_extensions": [".exe", ".msi", ".zip"],
+  "release_asset_max_mb": 300,
+  "declaration_template": "templates/xianyu_detail.md.tpl",
+  "declaration_text_file": "templates/declaration.txt"
+}

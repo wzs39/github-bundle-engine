@@ -1,0 +1,2 @@
+# 零依赖运行时: 仅使用 Python 标准库 (3.9+).
+# 可选: 设置环境变量 GITHUB_TOKEN 提升 GitHub Search API 速率限额.

@@ -1,0 +1,30 @@
+{
+  "api_root": "https://api.github.com",
+  "codeload_root": "https://codeload.github.com",
+  "github_token_env": "GITHUB_TOKEN",
+  "user_agent": "github-bundle-engine/1.0",
+  "timeout_seconds": 30,
+  "max_retries": 4,
+  "min_interval_seconds": 2.0,
+  "search_per_page": 100,
+  "download_mirrors": ["[MIRROR_PREFIX_1]", "[MIRROR_PREFIX_2]"],
+  "output_root": "OUTPUT_DIR",
+  "cache_root": "OUTPUT_DIR/cache",
+  "pan": {
+    "provider": "quark",
+    "promote_uid_env": "PAN_PROMOTE_UID",
+    "share_url_field": "pan_share_url",
+    "extract_code_field": "pan_extract_code",
+    "channel_report": "任推邦 / 星子助推 / 洽立方 任选其一报备"
+  },
+  "xianyu": {
+    "stock_min": 50,
+    "stock_max": 99,
+    "listing_interval_minutes": 60,
+    "auto_reply_plugin_env": "XIANYU_AUTO_REPLY_PLUGIN",
+    "link_min": 15,
+    "link_max": 25,
+    "exposure_threshold": 100,
+    "conversion_threshold": 0.05
+  }
+}

@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.before
+*.bak
+
+# 运行时产物: 夹具包 / 上架物料 / 复盘 / 缓存 tarball 一律不入库
+OUTPUT_DIR/
+*.part
+*.tmp
+
+# 本地凭据与网盘推广链 (只留占位符, 真实值走环境变量)
+.env
+.env.*
+*.secret
+_secrets/
+
+# 编辑器 / 系统
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
