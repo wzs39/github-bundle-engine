@@ -43,6 +43,15 @@ from src.packer import safe_name, render_project_manifest  # noqa: E402
 from src.pan import bind as bind_pan  # noqa: E402
 from src.pan import find_manifests, validate_extract_code, validate_share_url  # noqa: E402
 from src.scheduler import build_schedule, rotate_keywords, render_schedule_md  # noqa: E402
+from src.trends import (  # noqa: E402
+    apply_proposals,
+    parse_github_search,
+    parse_github_trending,
+    parse_json_api,
+    propose_updates,
+    repo_candidates,
+    score_verticals,
+)
 from scripts import economics  # noqa: E402
 
 CFG = load_config(ENGINE_ROOT / "config" / "compliance.json")
@@ -272,7 +281,8 @@ class TestSelfTestCommand(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             self.assertEqual(cli.main(["selftest", "--all-topics", "--out", td]), 0)
             packs = list(Path(td).glob("2026持续更新_*合集/_manifest.json"))
-            self.assertEqual(len(packs), 4)
+            # 专题数量跟随 config/topics.json, 新增专题不需要改这里
+            self.assertEqual(len(packs), len(TOPICS["topics"]))
             for mf in packs:
                 data = json.loads(mf.read_text(encoding="utf-8"))
                 self.assertTrue(data["topic"]["intro"], mf.name)
@@ -405,6 +415,211 @@ class TestScheduler(unittest.TestCase):
             base = Path(td) / "reports"
             self.assertTrue((base / "schedule_2026-09-17.json").is_file())
             self.assertTrue((base / "schedule_2026-09-17.md").is_file())
+
+
+class TestTrends(unittest.TestCase):
+    """热点聚合发现层: 夹具离线跑通 解析 -> 评分 -> 建议 -> 应用 -> CLI."""
+
+    GH_HTML = (
+        "<html><body>"
+        '<article class="Box-row">'
+        '<h2 class="h3"><a href="/acme/kaoyan-408-notes/stargazers">t</a></h2>'
+        '<p class="col-9 color-fg-muted my-1 pr-2">考研 408 复试资料整理, 含历年真题索引</p>'
+        '<a href="/acme/kaoyan-408-notes/stargazers"> 12,345 </a>'
+        '<span class="d-inline-block float-sm-right"> 1,234 stars today </span>'
+        '<span itemprop="programmingLanguage">Python</span>'
+        "</article>"
+        '<article class="Box-row">'
+        '<h2 class="h3"><a href="/acme/awesome-llm-toolkit/stargazers">t</a></h2>'
+        '<p class="col-9 color-fg-muted my-1 pr-2">Local AI agent toolkit with ollama support</p>'
+        '<span class="d-inline-block float-sm-right"> 2,500 stars today </span>'
+        '<span itemprop="programmingLanguage">TypeScript</span>'
+        "</article>"
+        "</body></html>"
+    )
+
+    FIXTURE = {
+        "sources": {
+            "gh-trending-daily": GH_HTML,
+            "weibo-hot": {
+                "data": {"realtime": [
+                    {"word": "考研国家线公布", "num": 123456},
+                    {"word": "高考志愿填报", "num": 9999},
+                    {"word": "英语四六级出分", "num": 8888},
+                    {"word": "破解软件合集", "num": 500},
+                ]}
+            },
+            "bilibili-popular": {
+                "data": {"list": [
+                    {"title": "考研政治冲刺指南", "stat": {"view": "52000"}, "bvid": "BVkaoyan01",
+                     "desc": "408 与政治冲刺"},
+                    {"title": "雅思口语满分示范", "stat": {"view": 31000.0}, "bvid": "BVeng01",
+                     "desc": "english speaking practice"},
+                ]}
+            },
+        }
+    }
+
+    def _fixture_file(self, td: str) -> str:
+        p = Path(td) / "fixture.json"
+        p.write_text(json.dumps(self.FIXTURE, ensure_ascii=False), encoding="utf-8")
+        return str(p)
+
+    def test_parse_github_trending(self) -> None:
+        items = parse_github_trending(self.GH_HTML, "gh-trending-daily")
+        self.assertEqual(2, len(items))
+        first = items[0]
+        self.assertEqual("acme/kaoyan-408-notes", first.repo)
+        self.assertEqual(1234, first.heat)
+        self.assertIn("考研 408", first.extra)
+        self.assertIn("[Python]", first.extra)
+        self.assertEqual("https://github.com/acme/kaoyan-408-notes", first.url)
+
+    def test_parse_json_api_weibo_and_bilibili(self) -> None:
+        weibo = parse_json_api(self.FIXTURE["sources"]["weibo-hot"], {
+            "item_path": "data.realtime", "title_field": "word", "heat_field": "num",
+        }, "weibo-hot")
+        self.assertEqual(4, len(weibo))
+        self.assertEqual("考研国家线公布", weibo[0].title)
+        self.assertEqual(123456, weibo[0].heat)
+
+        bili = parse_json_api(self.FIXTURE["sources"]["bilibili-popular"], {
+            "item_path": "data.list", "title_field": "title", "heat_field": "stat.view",
+            "url_field": "bvid", "url_prefix": "https://www.bilibili.com/video/",
+            "extra_field": "desc",
+        }, "bilibili-popular")
+        self.assertEqual(2, len(bili))
+        self.assertEqual(52000, bili[0].heat)
+        self.assertEqual("https://www.bilibili.com/video/BVkaoyan01", bili[0].url)
+        self.assertIn("408 与政治冲刺", bili[0].extra)
+
+    def test_parse_json_api_toutiao_cn_scale(self) -> None:
+        toutiao = parse_json_api({"data": [
+            {"Title": "考研国家线公布", "HotValue": "521万"},
+            {"Title": "高考倒计时", "HotValue": "1.2亿"},
+            {"Title": "英语四六级", "HotValue": 8888},
+        ]}, {"item_path": "data", "title_field": "Title", "heat_field": "HotValue"}, "toutiao-hot")
+        self.assertEqual(5210000, toutiao[0].heat)
+        self.assertEqual(120000000, toutiao[1].heat)
+        self.assertEqual(8888, toutiao[2].heat)
+
+    def test_parse_github_search(self) -> None:
+        data = {"total_count": 2, "items": [
+            {"full_name": "acme/kaoyan-408", "stargazers_count": 8000,
+             "description": "考研 408 资料整理", "topics": ["kaoyan", "notes"],
+             "html_url": "https://github.com/acme/kaoyan-408"},
+            {"full_name": "acme/english-vocab", "stargazers_count": 1200,
+             "description": "english vocabulary anki decks", "topics": ["anki"],
+             "html_url": "https://github.com/acme/english-vocab"},
+        ]}
+        items = parse_github_search(data, "gh-search-kaoyan")
+        self.assertEqual(2, len(items))
+        self.assertEqual("acme/kaoyan-408", items[0].repo)
+        self.assertEqual(8000, items[0].heat)
+        self.assertIn("[kaoyan]", items[0].extra)
+        # github_search 结果也是仓库候选, 描述带黑名单词会被 repo_candidates 剔除
+        data_bad = {"items": [{"full_name": "evil/x", "stargazers_count": 9,
+                               "description": "破解 工具合集", "topics": []}]}
+        cands = repo_candidates(parse_github_search(data_bad, "s"), ["破解"])
+        self.assertEqual([], cands)
+
+    def test_score_and_propose(self) -> None:
+        items = parse_github_trending(self.GH_HTML, "gh-trending-daily")
+        items += parse_json_api(self.FIXTURE["sources"]["weibo-hot"], {
+            "item_path": "data.realtime", "title_field": "word", "heat_field": "num",
+        }, "weibo-hot")
+        items += parse_json_api(self.FIXTURE["sources"]["bilibili-popular"], {
+            "item_path": "data.list", "title_field": "title", "heat_field": "stat.view",
+        }, "bilibili-popular")
+        trends_cfg = load_config(ENGINE_ROOT / "config" / "trends.json")
+        scores = score_verticals(items, trends_cfg["verticals"])
+        self.assertGreater(scores["kaoyan"]["hits"], 0)
+        self.assertIn("考研", scores["kaoyan"]["keyword_hits"])
+        self.assertGreater(scores["ai"]["hits"], 0)
+        self.assertGreater(scores["gaokao"]["hits"], 0)
+        self.assertGreater(scores["english"]["hits"], 0)
+        # 黑名单词出现在热搜里, 但不得进入任何建议词
+        self.assertIn("破解软件合集", [i.title for i in items])
+
+        topics = json.loads((ENGINE_ROOT / "config" / "topics.json").read_text(encoding="utf-8"))
+        compliance = {"block_terms": ["破解"]}
+        cands = repo_candidates(items, compliance["block_terms"])
+        self.assertFalse(any("破解" in c["description"] for c in cands))
+        cand_by_v: dict[str, list[dict]] = {vid: [] for vid in trends_cfg["verticals"]}
+        for c in cands:
+            hay = (c["repo"] + " " + c["description"]).lower()
+            for vid, vcfg in trends_cfg["verticals"].items():
+                if any(str(k).lower() in hay for k in vcfg["keywords"] if k):
+                    cand_by_v[vid].append(c)
+        proposals = propose_updates(scores, cand_by_v, topics, trends_cfg, compliance)
+        upd = next(u for u in proposals["updates"] if u["topic_id"] == "kaoyan")
+        self.assertTrue(upd["fields"]["long_tail"])
+        joined = " ".join(upd["fields"]["long_tail"])
+        self.assertNotIn("破解", joined)
+        self.assertTrue(upd["fields"]["trend_repos"])
+
+    def test_apply_writes_backup_and_keeps_copy_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            src = ENGINE_ROOT / "config" / "topics.json"
+            dst = Path(td) / "topics.json"
+            dst.write_bytes(src.read_bytes())
+            proposals = {
+                "updates": [{
+                    "vertical": "kaoyan", "topic_id": "kaoyan",
+                    "fields": {
+                        "long_tail": ["考研国家线", "408 真题"],
+                        "search_tags": ["kaoyan", "考研", "408", "cs-books", "interview", "study"],
+                        "trend_repos": [{"repo": "acme/kaoyan-408-notes", "stars_today": 1234}],
+                    },
+                    "hot_summary": ["考研国家线公布"],
+                }],
+                "skipped": [],
+            }
+            result = apply_proposals(dst, proposals)
+            self.assertTrue(Path(result["backup"]).is_file())
+            updated = json.loads(dst.read_text(encoding="utf-8"))
+            topic = next(t for t in updated["topics"] if t["id"] == "kaoyan")
+            self.assertEqual(["考研国家线", "408 真题"], topic["long_tail"])
+            self.assertIn("study", topic["search_tags"])
+            self.assertEqual(6, len(topic["search_tags"]))
+            self.assertEqual("acme/kaoyan-408-notes", topic["trend_repos"][0]["repo"])
+            # 文案字段不允许被 trends 触碰
+            self.assertIn("考研最耗人的", topic["intro"][0])
+
+    def test_cli_trends_fixture_end_to_end(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            topics_dst = Path(td) / "topics.json"
+            topics_dst.write_bytes((ENGINE_ROOT / "config" / "topics.json").read_bytes())
+            fixture = self._fixture_file(td)
+            rc = cli.main([
+                "trends", "--fixture", fixture, "--apply",
+                "--topics", str(topics_dst), "--out", td,
+            ])
+            self.assertEqual(0, rc)
+            reports = list((Path(td) / "reports").glob("trends_*.json"))
+            self.assertEqual(1, len(reports))
+            report = json.loads(reports[0].read_text(encoding="utf-8"))
+            self.assertGreater(report["items_total"], 0)
+            self.assertTrue(report["applied"])
+            updated = json.loads(topics_dst.read_text(encoding="utf-8"))
+            kaoyan = next(t for t in updated["topics"] if t["id"] == "kaoyan")
+            self.assertTrue(kaoyan.get("trend_repos"))
+            # 报告缓存留档
+            self.assertTrue((Path(td) / "cache" / "trends" / "latest.json").is_file())
+
+    def test_cli_daily_fixture_skip_build(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            topics_dst = Path(td) / "topics.json"
+            topics_dst.write_bytes((ENGINE_ROOT / "config" / "topics.json").read_bytes())
+            fixture = self._fixture_file(td)
+            rc = cli.main([
+                "daily", "--fixture", fixture, "--skip-build",
+                "--topics", str(topics_dst), "--out", td,
+            ])
+            self.assertEqual(0, rc)
+            self.assertTrue(list((Path(td) / "reports").glob("trends_*.json")))
+            updated = json.loads(topics_dst.read_text(encoding="utf-8"))
+            self.assertTrue(any(t.get("trend_repos") for t in updated["topics"]))
 
 
 if __name__ == "__main__":

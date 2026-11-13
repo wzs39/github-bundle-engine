@@ -1,8 +1,11 @@
-"""命令行编排: build / bind-pan / schedule / verify / report / selftest.
+"""命令行编排: build / bind-pan / schedule / verify / report / selftest / trends / daily.
 
 用法:
   python -m src.cli selftest --out OUTPUT_DIR
   python -m src.cli selftest --all-topics --out OUTPUT_DIR
+  python -m src.cli trends --out OUTPUT_DIR                       # 读热门总结站, 出发现报告
+  python -m src.cli trends --apply --out OUTPUT_DIR               # 建议写回 topics.json (先备份)
+  python -m src.cli daily --out OUTPUT_DIR                        # 热点->刷新专题->构建->校验->排程
   python -m src.cli build --topic py-office --out OUTPUT_DIR
   python -m src.cli build --all --out OUTPUT_DIR
   python -m src.cli bind-pan --topic py-office --share-url URL --extract-code CODE --out OUTPUT_DIR
@@ -10,7 +13,9 @@
   python -m src.cli verify --out OUTPUT_DIR
   python -m src.cli report --out OUTPUT_DIR --orders 7 --pan-new 3
 
-网络动作集中在 build; 其余子命令全程离线.
+网络动作集中在 build 与 trends; 其余子命令全程离线.
+daily 里 trends 建议会写回 config/topics.json (带 *.bak 备份),
+价格 / 受众 / 场景导语等文案字段永不自动修改.
 """
 from __future__ import annotations
 
@@ -52,11 +57,13 @@ from .packer import build_topic, safe_name
 from .pan import bind as bind_pan
 from .pan import find_manifests
 from .scheduler import build_schedule, render_schedule_md
+from .trends import run_trends
 
 ENGINE_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_TOPICS = ENGINE_ROOT / "config" / "topics.json"
 DEFAULT_SETTINGS = ENGINE_ROOT / "config" / "settings.json"
 DEFAULT_COMPLIANCE = ENGINE_ROOT / "config" / "compliance.json"
+DEFAULT_TRENDS = ENGINE_ROOT / "config" / "trends.json"
 
 
 def log(msg: str) -> None:
@@ -336,6 +343,93 @@ def cmd_build(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_trends(args: argparse.Namespace) -> int:
+    """读热门总结站 -> 垂直归属 -> (可选) 把刷新建议写回 topics.json."""
+    compliance = load_config(args.compliance)
+    trends_cfg = load_config(getattr(args, "trends_config") or DEFAULT_TRENDS)
+    fixture_arg = str(getattr(args, "fixture", "") or "")
+    fixture = Path(fixture_arg) if fixture_arg else None
+    report = run_trends(
+        trends_cfg=trends_cfg,
+        compliance_cfg=compliance,
+        topics_path=Path(args.topics),
+        out_root=Path(args.out),
+        fixture=fixture,
+        apply=bool(getattr(args, "apply", False)),
+    )
+    ok_sources = sum(1 for s in report["sources"] if s.get("ok"))
+    log("热点条目: " + str(report["items_total"]) + " / 源成功 "
+        + str(ok_sources) + "/" + str(len(report["sources"])))
+    for vid, score in report["scores"].items():
+        if score["hits"]:
+            log("  [" + vid + "] 得分 " + str(round(float(score["score"]), 2)) + " 热词: "
+                + ", ".join(list(score["keyword_hits"])[:6]))
+    for upd in report["proposals"]["updates"]:
+        log("  建议刷新 " + str(upd["topic_id"]) + " (" + str(upd["vertical"]) + "): long_tail -> "
+            + ", ".join(str(x) for x in (upd["fields"].get("long_tail") or [])))
+    for skipped in report["proposals"]["skipped"]:
+        log("  跳过 " + str(skipped["topic_id"]) + ": " + str(skipped["reason"]))
+    for w in report["warnings"]:
+        log("  WARN " + w)
+    if report.get("applied"):
+        log("已应用: " + str(report["applied"]["path"]) + " (备份 " + str(report["applied"]["backup"]) + ")")
+    log("报告: " + str(Path(args.out) / "reports"))
+    if report["items_total"] == 0:
+        log("FAIL 所有热点源零数据: 断网或站点改版时发生, 原始响应留档在 OUTPUT_DIR/cache/trends/")
+        return 1
+    return 0
+
+
+def cmd_daily(args: argparse.Namespace) -> int:
+    """一条龙: 热点发现 -> 应用刷新 -> 构建 -> 校验 -> 排程.
+
+    设计目标是无人在场也能跑: 单段失败降级为 WARN 不中断,
+    热点零数据(断网/站点改版)时跳过构建但仍返回 1 让计划任务告警.
+    """
+    args.apply = not bool(getattr(args, "no_apply", False))
+    log("[1/4] 热点发现")
+    trends_rc = cmd_trends(args)
+    if trends_rc != 0:
+        log("热点阶段失败, 后续跳过 (daily 退出码 1)")
+        return 1
+    if args.skip_build:
+        log("[2/4] 构建已按参数跳过")
+        return 0
+    log("[2/4] 构建专题包")
+    build_ns = argparse.Namespace(
+        topics=str(args.topics),
+        settings=str(args.settings),
+        compliance=str(args.compliance),
+        out=str(args.out),
+        topic="",
+        all=True,
+        pan_share_url=str(getattr(args, "pan_share_url", "") or ""),
+        pan_extract_code=str(getattr(args, "pan_extract_code", "") or ""),
+    )
+    if cmd_build(build_ns) != 0:
+        log("  构建失败, 校验与排程跳过 (daily 退出码 1)")
+        return 1
+    if not args.skip_verify:
+        log("[3/4] 校验产物")
+        verify_ns = argparse.Namespace(
+            topics=str(args.topics), settings=str(args.settings),
+            compliance=str(args.compliance), out=str(args.out),
+        )
+        if cmd_verify(verify_ns) != 0:
+            log("  WARN 校验存在 FAIL 项, 人工检查后再上架")
+    if not args.skip_schedule:
+        log("[4/4] 上架排程")
+        schedule_ns = argparse.Namespace(
+            topics=str(args.topics), settings=str(args.settings),
+            compliance=str(args.compliance), out=str(args.out),
+            start="", days=int(getattr(args, "days", 7)), per_day=2, interval=60,
+            existing_links=int(getattr(args, "existing_links", 0)),
+        )
+        if cmd_schedule(schedule_ns) != 0:
+            log("  WARN 排程未生成 (首次运行无历史包时正常)")
+    return 0
+
+
 def cmd_bind_pan(args: argparse.Namespace) -> int:
     """把已报备渠道生成的推广链回填到 _manifest.json 与自动发货文案."""
     root = Path(args.out)
@@ -492,6 +586,25 @@ def build_parser() -> argparse.ArgumentParser:
     b.add_argument("--pan-share-url", default="")
     b.add_argument("--pan-extract-code", default="")
     b.set_defaults(func=cmd_build)
+
+    t = sub.add_parser("trends", parents=[common], help="读热门总结站, 出专题刷新建议")
+    t.add_argument("--trends-config", default=str(DEFAULT_TRENDS))
+    t.add_argument("--apply", action="store_true", help="把建议写回 topics.json (先自动备份)")
+    t.add_argument("--fixture", default="", help="离线夹具 JSON, sources 字段按源 id 给原始响应")
+    t.set_defaults(func=cmd_trends)
+
+    d = sub.add_parser("daily", parents=[common], help="一条龙: 热点 -> 刷新专题 -> 构建 -> 校验 -> 排程")
+    d.add_argument("--trends-config", default=str(DEFAULT_TRENDS))
+    d.add_argument("--no-apply", action="store_true", help="只出发现报告, 不写回 topics.json")
+    d.add_argument("--skip-build", action="store_true")
+    d.add_argument("--skip-verify", action="store_true")
+    d.add_argument("--skip-schedule", action="store_true")
+    d.add_argument("--fixture", default="", help="离线夹具 JSON, 测试与无网试跑用")
+    d.add_argument("--days", type=int, default=7)
+    d.add_argument("--existing-links", type=int, default=0)
+    d.add_argument("--pan-share-url", default="")
+    d.add_argument("--pan-extract-code", default="")
+    d.set_defaults(func=cmd_daily)
 
     bp = sub.add_parser("bind-pan", parents=[common], help="回填已报备的网盘推广链与提取码")
     bp.add_argument("--topic", required=True)
